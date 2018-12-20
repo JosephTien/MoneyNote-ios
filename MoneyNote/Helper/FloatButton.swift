@@ -53,7 +53,8 @@ class FloatButton: UIButton{
         return set(text: text, function: function)
     }
     func set(text: String, function: @escaping (()->()))->FloatButton{
-        self.isHidden = (text=="")
+        self.isEnabled = !(text=="")
+        self.isHidden = !self.isEnabled
         setTitle(text, for: .normal)//ex: "✔", "✖"
         setTitleColor(UIColor.black, for: .normal)
         self.function = function
@@ -68,7 +69,7 @@ class FloatButton: UIButton{
 private class FloatingWindow: UIWindow {
     var buttons: [UIButton?] = []
     var floatingController: FloatingController?
-    
+    var blockAnyTouch = false
     init() {
         super.init(frame: UIScreen.main.bounds)
         backgroundColor = nil
@@ -79,9 +80,11 @@ private class FloatingWindow: UIWindow {
     }
     
     fileprivate override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        if(blockAnyTouch){return true}
         var trigger: Bool = false
         for button in buttons{
-            guard let button = button else { return false }
+            guard let button = button else {continue}
+            if (button.isHidden){continue}
             let buttonPoint = convert(point, to: button)
             trigger = trigger || button.point(inside: buttonPoint, with: event)
         }
@@ -94,14 +97,59 @@ class FloatingController: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
+    static var sharedInstance: FloatingController? = nil
+    var msgLabel = UILabel()
     init() {
         super.init(nibName: nil, bundle: nil)
         window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude)
         window.isHidden = false
         window.rootViewController = self
+        FloatingController.sharedInstance = self
+        self.view.addSubview(msgLabel)
     }
     func addButtonPoint(button: UIButton){
         window.buttons.append(button)
+    }
+    static func hideButtons(_ hide: Bool){
+        for button in FloatingController.sharedInstance!.window.buttons{
+            if ((button?.isEnabled)!){
+                button?.isHidden = hide
+            }else{
+                button?.isHidden = true
+            }
+        }
+    }
+    static func hide(){
+        FloatingController.sharedInstance!.view.isHidden = true
+        FloatingController.hideButtons(true)
+    }
+    static func show(){
+        FloatingController.sharedInstance!.view.isHidden = false
+        FloatingController.hideButtons(false)
+    }
+    static func coverAndShow(_ string: String){
+        FloatingController.show()
+        FloatingController.hideButtons(true)
+        FloatingController.sharedInstance!.view.backgroundColor = UIColor.white
+        FloatingController.sharedInstance!.window.blockAnyTouch = true
+        let shared = FloatingController.sharedInstance!
+        shared.msgLabel.text = string
+        shared.msgLabel.textAlignment = .center
+        shared.msgLabel.isHidden = false
+        shared.msgLabel.frame = shared.view.frame
+    }
+    static func cover(_ enable: Bool){
+        FloatingController.show()
+        if(enable){
+            FloatingController.hideButtons(true)
+            FloatingController.sharedInstance!.view.backgroundColor = UIColor.white
+            FloatingController.sharedInstance!.window.blockAnyTouch = true
+        }else{
+            FloatingController.hideButtons(false)
+            FloatingController.sharedInstance!.view.backgroundColor = nil
+            FloatingController.sharedInstance!.window.blockAnyTouch = false
+            FloatingController.sharedInstance!.msgLabel.isHidden = true
+        }
     }
     /*
     private(set) var button: UIButton!

@@ -5,7 +5,7 @@ class PhotoHandler: NSObject{
     static let shared = PhotoHandler()
     
     fileprivate var currentVC: UIViewController!
-    
+    var finalHandler = {}
     //MARK: Internal Properties
     var imagePickedBlock: ((UIImage?) -> Void)?
     
@@ -32,10 +32,10 @@ class PhotoHandler: NSObject{
         
     }
     
-    func showActionSheet(vc: UIViewController) {
+    func showActionSheet(vc: UIViewController, finalHandler: @escaping ()->()) {
         currentVC = vc
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
+        self.finalHandler = finalHandler
         //***** No auto-save, temporary remove this feature *****
         
         actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { (alert:UIAlertAction!) -> Void in
@@ -50,11 +50,11 @@ class PhotoHandler: NSObject{
             self.imagePickedBlock?(nil)
         }))
         
-        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (alert:UIAlertAction!) -> Void in
+            finalHandler()
+        }))
         vc.present(actionSheet, animated: true, completion: nil)
     }
-    
 }
 
 

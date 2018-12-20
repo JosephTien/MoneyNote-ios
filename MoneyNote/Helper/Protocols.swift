@@ -1,6 +1,7 @@
 protocol MyUiProtocol {
     func uiInit()
     func uiChange()
+    func setFloatingButton()
     func enableFields(_ state: Bool)
     func clearFields()
     func validateField()->Bool

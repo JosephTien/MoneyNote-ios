@@ -153,7 +153,9 @@ class SheetCollectionViewController: UICollectionViewController {
                 let id  = Int(Date().timeIntervalSince1970)
                 let sheet = DS.Sheet(
                     id: id,
-                    name: name
+                    name: name,
+                    spreadSheet: "",
+                    lastSyncTime: ""
                 )
                 DM.addSheet(sheet: sheet)
                 self.collectionView.reloadData()

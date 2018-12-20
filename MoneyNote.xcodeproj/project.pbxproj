@@ -13,6 +13,9 @@
 		7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E1121AE1538008E8AA5 /* LaunchScreen.storyboard */; };
 		7C012E1E21AE1538008E8AA5 /* AccountSheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */; };
 		7C012E2921AE1538008E8AA5 /* AccountSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */; };
+		7C172B7721C811070077972A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C172B7621C811070077972A /* GoogleService-Info.plist */; };
+		7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C172B7821C814B30077972A /* GSTableViewcontroller.swift */; };
+		7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */; };
 		7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */; };
 		7C8F65A121C1EE0300B53883 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A021C1EE0300B53883 /* Data.swift */; };
 		7C8F65A321C1F8EA00B53883 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A221C1F8EA00B53883 /* Protocols.swift */; };
@@ -63,9 +66,12 @@
 		7C012E1F21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSheetUITests.swift; sourceTree = "<group>"; };
 		7C012E2A21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7C172B7021C7F8CF0077972A /* MoneyNoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoneyNoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C172B7121C7F8CF0077972A /* MoneyNoteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoneyNoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7C172B7621C811070077972A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7C172B7821C814B30077972A /* GSTableViewcontroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSTableViewcontroller.swift; sourceTree = "<group>"; };
 		7C19BD7A21C7532400F1B7CA /* MoneyNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7C19BD7B21C7532400F1B7CA /* MoneyNoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = MoneyNoteTests.xctest; path = "/Users/Joseph/Documents/swift/MoneyNote/build/Debug-iphoneos/MoneyNoteTests.xctest"; sourceTree = "<absolute>"; };
-		7C19BD7C21C7532400F1B7CA /* MoneyNoteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = MoneyNoteUITests.xctest; path = "/Users/Joseph/Documents/swift/MoneyNote/build/Debug-iphoneos/MoneyNoteUITests.xctest"; sourceTree = "<absolute>"; };
+		7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsualListViewController.swift; sourceTree = "<group>"; };
 		7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		7C8F65A021C1EE0300B53883 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		7C8F65A221C1F8EA00B53883 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
@@ -143,6 +149,8 @@
 				5A1D55AFB7C8A61255237107 /* Pods */,
 				1343ED7B0DE515DDDEE002C6 /* Frameworks */,
 				7C19BD7A21C7532400F1B7CA /* MoneyNote.app */,
+				7C172B7021C7F8CF0077972A /* MoneyNoteTests.xctest */,
+				7C172B7121C7F8CF0077972A /* MoneyNoteUITests.xctest */,
 			);
 			sourceTree = "<group>";
 		};
@@ -150,6 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				7C012E1421AE1538008E8AA5 /* Info.plist */,
+				7C172B7621C811070077972A /* GoogleService-Info.plist */,
 				7C9D3BE721AE6D8400758C02 /* Assets.xcassets */,
 				7C8F65AA21C2DC9100B53883 /* Bkup */,
 				7C8F659F21C1EC4400B53883 /* App */,
@@ -185,6 +194,8 @@
 				7C012E0A21AE1537008E8AA5 /* NewItemViewController.swift */,
 				7C8F65A821C2D48500B53883 /* EditItemViewController.swift */,
 				7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */,
+				7C172B7821C814B30077972A /* GSTableViewcontroller.swift */,
+				7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -231,6 +242,8 @@
 				7C012E0121AE1537008E8AA5 /* Sources */,
 				7C012E0221AE1537008E8AA5 /* Frameworks */,
 				7C012E0321AE1537008E8AA5 /* Resources */,
+				DEBCD2B8C7E8B0543E059E96 /* [CP] Embed Pods Frameworks */,
+				344EA55B441087A16C41D173 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -257,7 +270,7 @@
 			);
 			name = MoneyNoteTests;
 			productName = AccountSheetTests;
-			productReference = 7C19BD7B21C7532400F1B7CA /* MoneyNoteTests.xctest */;
+			productReference = 7C172B7021C7F8CF0077972A /* MoneyNoteTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		7C012E2321AE1538008E8AA5 /* MoneyNoteUITests */ = {
@@ -276,7 +289,7 @@
 			);
 			name = MoneyNoteUITests;
 			productName = AccountSheetUITests;
-			productReference = 7C19BD7C21C7532400F1B7CA /* MoneyNoteUITests.xctest */;
+			productReference = 7C172B7121C7F8CF0077972A /* MoneyNoteUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -328,6 +341,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */,
+				7C172B7721C811070077972A /* GoogleService-Info.plist in Resources */,
 				7C9D3BE821AE6D8400758C02 /* Assets.xcassets in Resources */,
 				7C012E0E21AE1537008E8AA5 /* Main.storyboard in Resources */,
 			);
@@ -394,6 +408,28 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		344EA55B441087A16C41D173 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-MoneyNote/Pods-MoneyNote-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MoneyNote/Pods-MoneyNote-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		D0F3BE65A783E27451DEF40A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -416,6 +452,32 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DEBCD2B8C7E8B0543E059E96 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-MoneyNote/Pods-MoneyNote-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MoneyNote/Pods-MoneyNote-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -423,6 +485,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */,
 				7CF7801621C1A47600228BF1 /* SheetListViewController.swift in Sources */,
 				7C012E0B21AE1537008E8AA5 /* NewItemViewController.swift in Sources */,
 				7CF8B5CF21B82C28002ADB1E /* _EditItemViewController.swift in Sources */,
@@ -433,6 +496,7 @@
 				7C8F65A521C211C400B53883 /* SheetCollectionViewController.swift in Sources */,
 				7C012E0921AE1537008E8AA5 /* AppDelegate.swift in Sources */,
 				7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */,
+				7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */,
 				7CF8B5D121B86582002ADB1E /* Addon.swift in Sources */,
 				7C8F65A121C1EE0300B53883 /* Data.swift in Sources */,
 				7C9D3BEA21AF207400758C02 /* ItemListViewController.swift in Sources */,

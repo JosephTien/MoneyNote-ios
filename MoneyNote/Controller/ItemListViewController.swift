@@ -6,9 +6,14 @@ class ItemListCell: UITableViewCell {
     @IBOutlet weak var cellcomp_name: UILabel!
     @IBOutlet weak var cellcomp_price: UILabel!
     @IBOutlet weak var cellcomp_date: UILabel!
+    let msgLabel = UILabel()
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        msgLabel.frame = contentView.frame
+        msgLabel.textAlignment = .center
+        addSubview(msgLabel)
+        setCellStyle()
         // Initialization code
     }
     
@@ -17,6 +22,33 @@ class ItemListCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    func setContent(item: DS.Item){
+        let sign_done: String = "✓"//"✔"
+        let sign_receipt: String = "⌧"
+        let sign_dollar: String = "•"//"💲"
+        let datestr: String = item.date!
+        if datestr.count==10{
+            cellcomp_date.text = String(datestr[5..<datestr.count])
+        }
+        cellcomp_name.text = item.name
+        cellcomp_price.text = String(item.amount)
+        if(!item.receipt){
+            cellcomp_state.text = sign_receipt
+        }else if(!item.state){
+            cellcomp_state.text = sign_dollar
+        }else{
+            cellcomp_state.text = sign_done
+        }
+        msgLabel.text = ""
+    }
+    
+    func clearContent(){
+        cellcomp_state.text = ""
+        cellcomp_name.text = ""
+        cellcomp_price.text = ""
+        cellcomp_date.text = ""
+        msgLabel.text = "Deleted!"
+    }
 }
 
 class ItemListViewController: UITableViewController {
@@ -57,13 +89,33 @@ class ItemListViewController: UITableViewController {
         self.tableView.reloadData()
         uiChange()
         setFloatingButton()
-
+        FloatingController.show()
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        FloatingController.hide()
     }
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let idx = indexPath.section - 1
+        if (idx < 0) {return []}
+        let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
+        if (item.delete) {
+            let recover = UITableViewRowAction(style: .normal, title: "Recover") { (action, indexPath) in
+                DM.recoverItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: indexPath.section - 1)
+                if let cell = tableView.cellForRow(at: indexPath) as! ItemListCell?{
+                    cell.setContent(item: item)
+                }
+            }
+            return [recover]
+        }
         let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-            DM.deleteItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            DM.deleteItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: indexPath.section - 1)
+            if let cell = tableView.cellForRow(at: indexPath) as! ItemListCell?{
+                cell.clearContent()
+            }
+            //hard delete
+            //tableView.deleteSections([indexPath.section] , with: .fade)
+            
         }
         return [delete]
         /*
@@ -93,45 +145,34 @@ class ItemListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let idx = indexPath.section - 1
         if(idx>=0){
-            let sign_done: String = "☑"//"✔"
-            let sign_receipt: String = "⌧"
-            let sign_dollar: String = "☐"//"💲"
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemListCell", for: indexPath) as? ItemListCell else {
                 fatalError("The dequeued cell is not an instance of TableViewCell.")
             }
             let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
-            let datestr: String = item.date!
-            cell.cellcomp_date.text = String(datestr[5..<datestr.count])
-            cell.cellcomp_name.text = item.name
-            cell.cellcomp_price.text = String(item.amount)
-            if(!item.receipt){
-                cell.cellcomp_state.text = sign_receipt
-            }else if(!item.state){
-                cell.cellcomp_state.text = sign_dollar
+            if(item.delete){
+                cell.clearContent()
             }else{
-                cell.cellcomp_state.text = sign_done
+                cell.setContent(item: item)
             }
-            setCellStyle(cell.contentView)
             return cell
         }else if(idx == -1){
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddNewItem", for: indexPath)
-            setCellStyle(cell.contentView)
-                        return cell
+            return cell
         }
         return UITableViewCell()
-    }
-    
-    func setCellStyle(_ view: UIView){
-        let f = view.frame
-        let container = UIView(frame: CGRect(x: f.minX+10, y: f.minY, width: f.width-20, height: f.height))
-        container.layer.cornerRadius = 5
-        container.layer.borderWidth = 1
-        container.setFloating()
-        view.addSubview(container)
     }
         
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         AppDelegate.currentItemIdx = indexPath.section - 1
+        let idx = AppDelegate.currentItemIdx!
+        if(idx < 0){return}
+        let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
+        if(item.delete){return}
+        if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ItemViewController") as? EditItemViewController {
+            if let navigator = navigationController {
+                navigator.pushViewController(viewController, animated: false)
+            }
+        }
     }
     /*
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath:

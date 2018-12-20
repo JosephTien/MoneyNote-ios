@@ -9,7 +9,6 @@
 import UIKit
 
 class _EditItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtocol, MyDataProtocol {
-
     @IBOutlet weak var field_io: UISegmentedControl!
     @IBOutlet weak var field_date: UITextField!
     @IBOutlet weak var field_name: UITextField!
@@ -148,6 +147,7 @@ class _EditItemViewController: UITableViewController, UITextFieldDelegate, MyUiP
         }
     }
     
+    func setFloatingButton() {}
     //*************** MyData ***************//
     func addItem2List(){}
     func editItem2List(_ index: Int) {
@@ -160,7 +160,7 @@ class _EditItemViewController: UITableViewController, UITextFieldDelegate, MyUiP
         var amount = (field_amount.text?.floatValue)!
         if(field_io.selectedSegmentIndex==0){amount *= -1}
         let item_new = DS.Item(
-            id: 0,
+            id: item.id,
             date: field_date.text,
             name: field_name.text,
             sort: field_sort.text,
@@ -169,7 +169,9 @@ class _EditItemViewController: UITableViewController, UITextFieldDelegate, MyUiP
             reimburse: false,
             receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
             amount: amount,
-            path: url
+            path: url,
+            timestamp: 0,
+            delete: false
         )
         DM.editItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: index, item: item_new)
     }
@@ -195,7 +197,10 @@ class _EditItemViewController: UITableViewController, UITextFieldDelegate, MyUiP
     }
     @objc func loadPhoto(){
         photo_edited = false
-        PhotoHandler.shared.showActionSheet(vc: self)
+        FloatingController.hide()
+        PhotoHandler.shared.showActionSheet(vc: self){
+            FloatingController.show()
+        }
         PhotoHandler.shared.imagePickedBlock = { (image) in
             self.image_photo.image = image
             self.photo_edited = true

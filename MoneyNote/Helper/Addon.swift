@@ -1,5 +1,11 @@
 import UIKit
 
+extension Date{
+    func secondFrom1970()->Int{
+        return Int(Date().timeIntervalSince1970)
+    }
+}
+
 extension String {
     var floatValue: Float {
         return (self as NSString).floatValue
@@ -46,6 +52,38 @@ extension UITextField{
             borderStyle = .roundedRect
             textAlignment = .right
         }
+    }
+}
+
+extension UITableViewCell{
+    func setCellStyle(){
+        let f = frame
+        let container = UIView(frame: CGRect(x: f.minX+10, y: f.minY, width: f.width-20, height: f.height))
+        container.layer.cornerRadius = 5
+        container.layer.borderWidth = 1
+        container.setFloating()
+        contentView.addSubview(container)
+    }
+}
+
+extension UIButton{
+    func setBorder(color: UIColor)->UIButton{
+        layer.borderWidth = 1
+        layer.borderColor = color.cgColor
+        return self
+    }
+    func setBorder()->UIButton{
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.black.cgColor
+        return self
+    }
+    func setRoundStyle()->UIButton{
+        layer.cornerRadius = frame.height/2
+        return self
+    }
+    func setBlackText()->UIButton{
+        setTitleColor(UIColor.black, for: .normal)
+        return self
     }
 }
 
@@ -208,42 +246,85 @@ class DialogService {
     init(_ controller: UIViewController){
         self.controller = controller
     }
-    
+    static var commonBeforeHandler = {}
+    static var commonFinalHandler = {}
     func showDialog_comfirm(_ title: String?,_ msg: String?, function: @escaping ()->()) {
-        let alertController = UIAlertController(title: title,
-                                                message: msg, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "取消", style: .default, handler: nil)
+        DialogService.commonBeforeHandler()
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "取消", style: .default, handler:
+            {(action: UIAlertAction!) in
+                DialogService.commonFinalHandler()
+            }
+        )
         alertController.addAction(cancelAction)
         let okAction = UIAlertAction(title: "確定", style: .destructive, handler: {
             (action: UIAlertAction!) in
+                DialogService.commonFinalHandler()
                 function()
-        })
+            }
+        )
         alertController.addAction(okAction)
         controller?.present(alertController, animated: true, completion: nil)
     }
     
     func showDialog_failed(_ title: String?,_ msg: String?) {
-        let alertController = UIAlertController(title: title,
-                                                message: msg, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "確定", style: .default, handler: nil)
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        DialogService.commonBeforeHandler()
+        let okAction = UIAlertAction(title: "確定", style: .default, handler:
+            {(action: UIAlertAction!) in
+                DialogService.commonFinalHandler()
+            }
+        )
+        alertController.addAction(okAction)
+        controller?.present(alertController, animated: true, completion: nil)
+    }
+
+    func showDialog_ok(_ title: String?,_ msg: String?, function: @escaping ()->()) {
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        DialogService.commonBeforeHandler()
+        let okAction = UIAlertAction(title: "確定", style: .default, handler: {
+            (action: UIAlertAction!) in
+            DialogService.commonFinalHandler()
+            function()
+        })
         alertController.addAction(okAction)
         controller?.present(alertController, animated: true, completion: nil)
     }
     
     func showDialog_done(_ title: String?,_ msg: String?) {
-        let alertController = UIAlertController(title: title,
-                                                message: msg, preferredStyle: .alert)
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        DialogService.commonBeforeHandler()
         self.controller?.present(alertController, animated: true, completion: nil)
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             self.controller?.presentedViewController?.dismiss(animated: false, completion: nil)
+            DialogService.commonFinalHandler()
         }
     }
     func showDialog_done(_ title: String?,_ msg: String?, action: @escaping ()->()) {
-        let alertController = UIAlertController(title: title,
-                                                message: msg, preferredStyle: .alert)
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        DialogService.commonBeforeHandler()
         self.controller?.present(alertController, animated: true, completion: nil)
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1) {
             self.controller?.presentedViewController?.dismiss(animated: false, completion: action)
+            DialogService.commonFinalHandler()
         }
+    }
+
+    func showDialog_ask(_ title: String?,_ msg: String?, function: @escaping ()->()) {
+        let alertController = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+        DialogService.commonBeforeHandler()
+        let cancelAction = UIAlertAction(title: "取消", style: .default, handler:
+            {(action: UIAlertAction!) in
+                DialogService.commonFinalHandler()
+            }
+        )
+        alertController.addAction(cancelAction)
+        let okAction = UIAlertAction(title: "確定", style: .default, handler: {
+            (action: UIAlertAction!) in
+            DialogService.commonFinalHandler()
+            function()
+        })
+        alertController.addAction(okAction)
+        controller?.present(alertController, animated: true, completion: nil)
     }
 }

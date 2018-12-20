@@ -20,6 +20,8 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     @IBOutlet weak var field_amount: UITextField!
     @IBOutlet weak var label_state: UILabel!
     @IBOutlet weak var btn_photo: UIButton!
+    @IBOutlet weak var btn_usual_name: UIButton!
+    @IBOutlet weak var btn_usual_sort: UIButton!
     @IBOutlet weak var tablecell_payer: UIView!
     @IBOutlet weak var tablecell_receipt: UITableViewCell!
     @IBOutlet weak var tablecell_photo: UIView!
@@ -27,6 +29,8 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     //*************** My Variable ***************//
     var datePickerService: DatePickerServic?
     var editMode = true
+    var image: UIImage? = nil
+    var quickFillTargetTag = 0
     //*************** MyUi ***************//
     
     func uiInit(){
@@ -52,6 +56,12 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         //Photo Picker
         btn_photo.addTarget(self, action: #selector(loadPhoto), for: UIControl.Event.primaryActionTriggered)
         
+        //set usual btn
+        _ = btn_usual_name.setBlackText().setRoundStyle()
+        btn_usual_name.addTarget(self, action: #selector(openUaualList_name), for: .touchUpInside)
+        _ = btn_usual_sort.setBlackText().setRoundStyle()
+        btn_usual_sort.addTarget(self, action: #selector(openUaualList_sort), for: .touchUpInside)
+
     }
     func setFloatingButton(){
         _ = AppDelegate.floatingButtons[0]!.set(text: "✖"){
@@ -91,6 +101,8 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
             self.btn_photo.layer.borderWidth = 0
             btn_photo.setTitle("", for: .normal)
         }
+        
+        image_photo.image = image
     }
     
     func enableFields(_ state: Bool){
@@ -105,6 +117,8 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         field_receipt.isEnabled = state
         field_amount.setEnable(state)
         btn_photo.isEnabled = state
+        btn_usual_name.isHidden = !state
+        btn_usual_sort.isHidden = !state
         if(state){
             btn_photo.setTitle("Load Picture...", for: .normal)
             field_payer.placeholder = field_io.selectedSegmentIndex == 0 ? "墊款人" : "負責人"
@@ -115,7 +129,7 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     }
     
     func clearFields(){
-        field_io.selectedSegmentIndex = 0
+        //field_io.selectedSegmentIndex = 0
         field_date.text = ""
         field_name.text = ""
         field_sort.text = ""
@@ -145,10 +159,12 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     //*************** MyData ***************//
     func addItem2List(){
         var amount = (field_amount.text?.floatValue)!
-        if(field_io.selectedSegmentIndex==0){ amount *= -1 }
+        if(field_io.selectedSegmentIndex==0 && amount < 0){ amount *= -1 }
         let url = image_photo.image?.saveImageToLocal()
+        let sheetid = DM.getCurrentSheet()!.id
+        let timestamp = Date().secondFrom1970()
         let item = DS.Item(
-            id: 0,
+            id: String(sheetid)+String(timestamp),
             date: field_date.text,
             name: field_name.text,
             sort: field_sort.text,
@@ -157,7 +173,9 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
             reimburse: false,
             receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
             amount: amount,
-            path: (url ?? "")
+            path: (url ?? ""),
+            timestamp: timestamp,
+            delete: false
             //path: localPathStr
         )
         //currentSheetIndex
@@ -176,9 +194,38 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         addNewItem()
     }
     @objc func loadPhoto(){
-        PhotoHandler.shared.showActionSheet(vc: self)
+        FloatingController.hide()
+        PhotoHandler.shared.showActionSheet(vc: self){
+            FloatingController.show()
+        }
         PhotoHandler.shared.imagePickedBlock = { (image) in
             self.image_photo.image = image
+            self.image = image
+            FloatingController.show()
+        }
+    }
+    
+    @objc func openUaualList_name(){
+        UsualListViewController.targetTag = 1
+        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualListViewController")
+        navigationController?.pushViewController(controller, animated: false)
+    }
+    @objc func openUaualList_sort(){
+        UsualListViewController.targetTag = 2
+        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualListViewController")
+        navigationController?.pushViewController(controller, animated: false)
+    }
+    
+    func prepareUsual(){
+        if(UsualListViewController.targetTag==1){
+            field_name.text = UsualListViewController.currentString
+            UsualListViewController.targetTag = 0
+            UsualListViewController.currentString = ""
+        }
+        if(UsualListViewController.targetTag==2){
+            field_sort.text = UsualListViewController.currentString
+            UsualListViewController.targetTag = 0
+            UsualListViewController.currentString = ""
         }
     }
     //*************** UiViewController ***************//
@@ -188,9 +235,15 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setFloatingButton()
         uiChange()
+        setFloatingButton()
+        prepareUsual()
+        FloatingController.show()
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        FloatingController.hide()
+    }
+    
     //*************** UITextFieldDelegate ***************//
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)

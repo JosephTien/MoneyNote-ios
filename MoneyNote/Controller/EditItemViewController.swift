@@ -21,6 +21,9 @@ class EditItemViewController: NewItemViewController{
     @IBOutlet weak var overide_field_amount: UITextField!
     @IBOutlet weak var overide_label_state: UILabel!
     @IBOutlet weak var overide_btn_photo: UIButton!
+    @IBOutlet weak var override_btn_usual_name: UIButton!
+    @IBOutlet weak var override_btn_usual_sort: UIButton!
+    
     @IBOutlet weak var overide_tablecell_payer: UIView!
     @IBOutlet weak var overide_tablecell_receipt: UITableViewCell!
     @IBOutlet weak var overide_tablecell_photo: UIView!
@@ -28,7 +31,6 @@ class EditItemViewController: NewItemViewController{
     
     //*************** My Variable ***************//
     var photo_edited = false
-    
     //*************** UITextFieldDelegate ***************//
     
     //*************** MyUi ***************//
@@ -44,14 +46,17 @@ class EditItemViewController: NewItemViewController{
         field_amount    = overide_field_amount
         label_state     = overide_label_state
         btn_photo       = overide_btn_photo
+        btn_usual_name  = override_btn_usual_name
+        btn_usual_sort  = override_btn_usual_sort
         tablecell_payer = overide_tablecell_payer
         tablecell_receipt   = overide_tablecell_receipt
         tablecell_photo     = overide_tablecell_photo
         image_photo         = overide_image_photo
     }
+    
     func setFieldData(){
         let item = DM.table[AppDelegate.currentSheetIdx!].items[AppDelegate.currentItemIdx!]
-        if item.amount > 0.0{
+        if item.amount >= 0.0{
             field_io.selectedSegmentIndex = 1
             field_amount.text = String(item.amount)
         }else {
@@ -66,6 +71,7 @@ class EditItemViewController: NewItemViewController{
         field_receipt.isOn = item.receipt
         if let imageData = NSData(contentsOfFile: item.path){
             image_photo.image = UIImage(data: imageData as Data)!
+            image = image_photo.image
         }
     }
     override func uiInit(){
@@ -74,13 +80,20 @@ class EditItemViewController: NewItemViewController{
         setFieldData()
         enableFields(false)
     }
+    override func uiChange() {
+        super.uiChange()
+    }
     override func setFloatingButton(){
-        _ = AppDelegate.floatingButtons[0]!.set(text: "ㄑ"){
-            self.navigationController?.popViewController(animated: false)
-        }
-        _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
-        _ = AppDelegate.floatingButtons[2]!.set(text: "✎"){
-            self.toggleMode()
+        if(self.navigationItem.rightBarButtonItem?.title=="Edit"){
+            _ = AppDelegate.floatingButtons[0]!.set(text: "ㄑ"){
+                self.navigationController?.popViewController(animated: false)
+            }
+            _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
+            _ = AppDelegate.floatingButtons[2]!.set(text: "✎"){
+                self.toggleMode()
+            }
+        }else if(self.navigationItem.rightBarButtonItem?.title=="Done"){
+            setFloatingButton2()
         }
     }
     func setFloatingButton2(){
@@ -102,6 +115,11 @@ class EditItemViewController: NewItemViewController{
             if(validateField()){
                 let index = AppDelegate.currentItemIdx!
                 editItem2List(index)
+                enableFields(false)
+                self.navigationItem.rightBarButtonItem?.title="Edit"
+                self.navigationItem.rightBarButtonItem?.style = .plain
+                setFloatingButton()
+                uiChange()
                 DialogService(self).showDialog_done("修改成功!",nil){
                     self.navigationController?.popViewController(animated: false)
                 }
@@ -123,9 +141,9 @@ class EditItemViewController: NewItemViewController{
             url = image_photo.image?.saveImageToLocal() ?? ""
         }
         var amount = (field_amount.text?.floatValue)!
-        if(field_io.selectedSegmentIndex==0){amount *= -1}
+        if(field_io.selectedSegmentIndex==0 && amount<0){amount *= -1}
         let item_new = DS.Item(
-            id: 0,
+            id: item.id,
             date: field_date.text,
             name: field_name.text,
             sort: field_sort.text,
@@ -134,7 +152,9 @@ class EditItemViewController: NewItemViewController{
             reimburse: false,
             receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
             amount: amount,
-            path: url
+            path: url,
+            timestamp: Date().secondFrom1970(),
+            delete: false
         )
         DM.editItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: index, item: item_new)
     }
