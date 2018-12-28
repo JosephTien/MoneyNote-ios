@@ -4,16 +4,17 @@ import UIKit
 
 class ProfileViewController: GSTableViewcontroller{
     
-    @IBOutlet weak var label_calculate: UILabel!
-    @IBOutlet weak var label_wallet: UILabel!
+    @IBOutlet weak var label_calculate: UITextField!
+    @IBOutlet weak var label_wallet: UITextField!
  
-    @IBOutlet weak var label_sync: UILabel!
-    @IBOutlet weak var label_name: UILabel!
+    @IBOutlet weak var label_sync: UITextField!
+    @IBOutlet weak var label_name: UITextField!
     @IBOutlet weak var btn_sync: UIButton!
     //************* my Variable **************
     var listPickerService: ListPickerServic?
     var importSucceed = false
     var outportSucceed = false
+    var qrAlert: UIAlertController?
 //************** My UI function **************
     func uiInit(){
         setButtonStyle(btn_sync)
@@ -49,6 +50,11 @@ class ProfileViewController: GSTableViewcontroller{
             self.showActionSheet()
         }
     }
+    func unsetFloatingButton(){
+        _ = AppDelegate.floatingButtons[0]!.set(text: ""){}
+        _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
+        _ = AppDelegate.floatingButtons[2]!.set(text: ""){}
+    }
     
     func calculate(){
         let sheetIdx = AppDelegate.currentSheetIdx!
@@ -75,6 +81,7 @@ class ProfileViewController: GSTableViewcontroller{
         FloatingController.show()
     }
     override func viewWillDisappear(_ animated: Bool) {
+        unsetFloatingButton()
         FloatingController.hide()
     }
     @IBAction func btn_sync(_ sender: Any) {
@@ -192,6 +199,7 @@ class ProfileViewController: GSTableViewcontroller{
                 }
             )
         )
+        //若要向他人分享帳冊，您必須至該Google Sheet的設定中將其Google Account加入為協作者，或是將共用模式設定為「知道連結的人皆可編輯」
         
         DialogService(self).showDialog_ask("從剪貼簿複製ID？", ""){
             FloatingController.hide()
@@ -256,7 +264,8 @@ class ProfileViewController: GSTableViewcontroller{
             }))
             
             actionSheet.addAction(UIAlertAction(title: "Show QRcode", style: .default, handler: { (alert:UIAlertAction!) -> Void in
-                FloatingController.show()
+                //FloatingController.show()
+                self.showQRCode(sheet.spreadSheet)
             }))
             
             actionSheet.addAction(UIAlertAction(title: "Unlink", style: .default, handler: { (alert:UIAlertAction!) -> Void in
@@ -275,9 +284,23 @@ class ProfileViewController: GSTableViewcontroller{
             
             actionSheet.addAction(UIAlertAction(title: "Link Current Sheet", style: .default, handler: { (alert:UIAlertAction!) -> Void in
                 FloatingController.show()
-                DialogService(self).showDialog_ask("注意", "除非該表單為本帳務的原始表單，否則第一次同步至其他現有表單會混合本機資料和線上資料，請確定目標表單無誤。"){
+                DialogService(self).showDialog_ask("注意", "除非該表單為本帳冊的原始表單，否則第一次同步至其他現有表單會混合本機資料和線上資料，請確定目標表單無誤。"){
                     self.addSync()
                 }
+            }))
+            
+            actionSheet.addAction(UIAlertAction(title: "Scan QR Code", style: .default, handler: { (alert:UIAlertAction!) -> Void in
+                let QRHelper = QRScanViewController()
+                QRHelper.finalHandler = {
+                    self.navigationController!.popViewController(animated: false)
+                    if(QRHelper.code != ""){
+                        UIPasteboard.general.string = QRHelper.code
+                        DialogService(self).showDialog_done("ID已複製到剪貼簿","")//FloatingController.show() will execute
+                    }else{
+                        FloatingController.show()
+                    }
+                }
+                self.navigationController!.pushViewController(QRHelper, animated: false)
             }))
         }
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (alert:UIAlertAction!) -> Void in
@@ -364,13 +387,95 @@ class ProfileViewController: GSTableViewcontroller{
         }
         return values
     }
+    
+    func generateQRCode(_ string: String)->CIImage{
+        let data = string.data(using: String.Encoding.isoLatin1, allowLossyConversion: false)
+        let filter = CIFilter(name: "CIQRCodeGenerator")
+        filter?.setValue(data, forKey: "inputMessage")
+        filter?.setValue("Q", forKey: "inputCorrectionLevel")
+        let qrcodeImage = (filter?.outputImage)!
+        
+        let width = UIScreen.main.bounds.width / 1.1
+        let scaleX = width / qrcodeImage.extent.size.width
+        let scaleY = width / qrcodeImage.extent.size.height
+        let transformedImage = qrcodeImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+        return transformedImage
+    }
+    
+    func showQRCode(_ string: String) {
+        let qrCIImage = generateQRCode(string)
+        let qrImageView = UIImageView(frame: qrCIImage.extent )
+        qrImageView.image = UIImage(ciImage: qrCIImage)
+        //qrImageView.image?.withRenderingMode(.alwaysOriginal)
+ 
+        let qrAlert = UIAlertController(
+            title: "",
+            message: nil,
+            preferredStyle: .alert)
+        
+        qrAlert.view.addSubview(qrImageView)
+        qrImageView.alignCenter(to: qrAlert.view)
+        
+        /*
+        let dismissBtn = UIButton()
+        dismissBtn.frame.size = UIScreen.main.bounds.size//qrImageView.frame.size
+        dismissBtn.addTarget(self, action: #selector(dismissQRAlert), for: .touchUpInside)
+        qrAlert.view.addSubview(dismissBtn)
+         */
+        self.qrAlert = qrAlert
+        
+        FloatingController.showPartialButtons([false,false,false,true])
+        _ = AppDelegate.floatingButtons[3]!.set(text: " "){
+            if let qrAlert = self.qrAlert{
+                qrAlert.dismiss(animated: true, completion: {
+                    FloatingController.show()
+                })
+                self.qrAlert = nil
+                _ = AppDelegate.floatingButtons[3]!.set(text: ""){}
+            }
+            
+        }
+        
+        /*
+        let image = UIImage(color: UIColor.white, size: CGSize(width: width/2, height: width/2))?.alpha(0)
+        let alertAction = UIAlertAction(title: "", style: .default, handler: {_ in FloatingController.show()})
+        alertAction.setValue(image, forKey: "image")
+        alert.addAction(alertAction)
+         */
+        /*
+        alert.addAction(
+            UIAlertAction(
+                title: "OK",
+                style: .cancel,
+                handler: {_ in
+                    FloatingController.show()
+                }
+            )
+        )
+        */
+        self.present(
+            qrAlert,
+            animated: true,
+            completion: nil
+        )
+    }
+    @objc func dismissQRAlert(){
+        if let qrAlert = self.qrAlert{
+            qrAlert.dismiss(animated: true, completion: {
+                FloatingController.show()
+            })
+            self.qrAlert = nil
+        }
+    }
 }
 
-
-//Todo: QRcode
+//Todo: note
+//Todo: Edit ListName
+//Todo: privage
 //Todo: Add Sort
 //Todo: view by sort
 //Todo: Sort
 //Todo: Firebase db
 //Todo: view Photo
 //Todo: ActionSheetModule
+//English

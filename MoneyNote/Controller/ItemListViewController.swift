@@ -2,6 +2,7 @@ import UIKit
 
 class ItemListCell: UITableViewCell {
     
+    @IBOutlet weak var cellcomp_receipt: UILabel!
     @IBOutlet weak var cellcomp_state: UILabel!
     @IBOutlet weak var cellcomp_name: UILabel!
     @IBOutlet weak var cellcomp_price: UILabel!
@@ -23,21 +24,26 @@ class ItemListCell: UITableViewCell {
     }
     
     func setContent(item: DS.Item){
-        let sign_done: String = "✓"//"✔"
-        let sign_receipt: String = "⌧"
-        let sign_dollar: String = "•"//"💲"
+        let sign_done: String = "◈"//"✔"//"✓"
+        let sign_receipt: String = "◇"//"✖"//•
+        let sign_dollar: String = "○"//"◯💲"
+        let sign_ok: String = "◉"
+        
         let datestr: String = item.date!
         if datestr.count==10{
             cellcomp_date.text = String(datestr[5..<datestr.count])
         }
         cellcomp_name.text = item.name
         cellcomp_price.text = String(item.amount)
-        if(!item.receipt){
-            cellcomp_state.text = sign_receipt
-        }else if(!item.state){
+        if(!item.state){
             cellcomp_state.text = sign_dollar
+        } else{
+            cellcomp_state.text = sign_ok
+        }
+        if(!item.receipt){
+            cellcomp_receipt.text = sign_receipt
         }else{
-            cellcomp_state.text = sign_done
+            cellcomp_receipt.text = sign_done
         }
         msgLabel.text = ""
     }
@@ -47,6 +53,7 @@ class ItemListCell: UITableViewCell {
         cellcomp_name.text = ""
         cellcomp_price.text = ""
         cellcomp_date.text = ""
+        cellcomp_receipt.text = ""
         msgLabel.text = "Deleted!"
     }
 }
@@ -56,10 +63,12 @@ class ItemListViewController: UITableViewController {
 
 // -------------------- My Variable ----------------------
     static var share: ItemListViewController?
-    
+    var visableItems: [Int] = []
+    var showDeleted = false
 //--------------------- UI Function ----------------------
     func uiInit(){
         self.navigationItem.title = DM.table[AppDelegate.currentSheetIdx!].sheet.name
+        assignVisableItems()
     }
     func uiChange(){
         
@@ -73,8 +82,26 @@ class ItemListViewController: UITableViewController {
                 self.navigationController?.pushViewController(vc, animated: false)
             }
         }
-        _ = AppDelegate.floatingButtons[2]!.set(text: ""){}
+        _ = AppDelegate.floatingButtons[2]!.set(text: ":"){
+            self.showDeleted = !self.showDeleted
+            if(self.showDeleted){
+                DialogService(self).showDialog_done("顯示已刪除", nil)
+            }else{
+                DialogService(self).showDialog_done("隱藏已刪除", nil)
+            }
+            self.assignVisableItems()
+            self.tableView.reloadData()
+        }
     }
+    func assignVisableItems(){
+        visableItems = []
+        for (idx, item) in DM.table[AppDelegate.currentSheetIdx!].items.enumerated(){
+            if (!item.delete || showDeleted){
+                visableItems.append(idx)
+            }
+        }
+    }
+    
 // -------------------- Data function --------------------
     func dataInit(){
         ItemListViewController.share = self
@@ -86,6 +113,7 @@ class ItemListViewController: UITableViewController {
         dataInit()
     }
     override func viewWillAppear(_ animated: Bool) {
+        self.assignVisableItems()
         self.tableView.reloadData()
         uiChange()
         setFloatingButton()
@@ -96,12 +124,13 @@ class ItemListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        let idx = indexPath.section - 1
-        if (idx < 0) {return []}
+        let choosen = indexPath.section - 1
+        if (choosen < 0) {return []}
+        let idx = visableItems[choosen]
         let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
         if (item.delete) {
             let recover = UITableViewRowAction(style: .normal, title: "Recover") { (action, indexPath) in
-                DM.recoverItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: indexPath.section - 1)
+                DM.recoverItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: idx)
                 if let cell = tableView.cellForRow(at: indexPath) as! ItemListCell?{
                     cell.setContent(item: item)
                 }
@@ -109,7 +138,7 @@ class ItemListViewController: UITableViewController {
             return [recover]
         }
         let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-            DM.deleteItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: indexPath.section - 1)
+            DM.deleteItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: idx)
             if let cell = tableView.cellForRow(at: indexPath) as! ItemListCell?{
                 cell.clearContent()
             }
@@ -135,7 +164,8 @@ class ItemListViewController: UITableViewController {
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return DM.table[AppDelegate.currentSheetIdx!].items.count + 1
+        //return DM.table[AppDelegate.currentSheetIdx!].items.count + 1
+        return visableItems.count + 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -143,8 +173,9 @@ class ItemListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let idx = indexPath.section - 1
-        if(idx>=0){
+        let choosen = indexPath.section - 1
+        if(choosen>=0){
+            let idx = visableItems[choosen]
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "ItemListCell", for: indexPath) as? ItemListCell else {
                 fatalError("The dequeued cell is not an instance of TableViewCell.")
             }
@@ -154,8 +185,10 @@ class ItemListViewController: UITableViewController {
             }else{
                 cell.setContent(item: item)
             }
+            cell.isHidden = (!self.showDeleted && item.delete)
+            
             return cell
-        }else if(idx == -1){
+        }else if(choosen == -1){
             let cell = tableView.dequeueReusableCell(withIdentifier: "AddNewItem", for: indexPath)
             return cell
         }
@@ -163,12 +196,15 @@ class ItemListViewController: UITableViewController {
     }
         
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        AppDelegate.currentItemIdx = indexPath.section - 1
+        let choosen = indexPath.section - 1
+        if(choosen<0){AppDelegate.currentItemIdx = -1}
+        else {AppDelegate.currentItemIdx = visableItems[choosen]}
         let idx = AppDelegate.currentItemIdx!
-        if(idx < 0){return}
-        let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
-        if(item.delete){return}
-        if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ItemViewController") as? EditItemViewController {
+        if(idx >= 0){
+            let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
+            if(item.delete){return}
+        }
+        if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ItemViewController") as? ItemViewController {
             if let navigator = navigationController {
                 navigator.pushViewController(viewController, animated: false)
             }

@@ -120,6 +120,7 @@ class DS{//DataStructure
     }
     struct UsualList: Codable{
         var strings:[String] = []
+        var sorts:[String] = []
         static let documentsDirectory = FileManager.default.urls(for: .documentDirectory,
                                                                  in: .userDomainMask).first!
         static let propertyEncoder = PropertyListEncoder()

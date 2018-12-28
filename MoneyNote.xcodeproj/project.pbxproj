@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7C012E0921AE1537008E8AA5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E0821AE1537008E8AA5 /* AppDelegate.swift */; };
-		7C012E0B21AE1537008E8AA5 /* NewItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E0A21AE1537008E8AA5 /* NewItemViewController.swift */; };
+		7C012E0B21AE1537008E8AA5 /* ItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E0A21AE1537008E8AA5 /* ItemViewController.swift */; };
 		7C012E0E21AE1537008E8AA5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E0C21AE1537008E8AA5 /* Main.storyboard */; };
 		7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E1121AE1538008E8AA5 /* LaunchScreen.storyboard */; };
 		7C012E1E21AE1538008E8AA5 /* AccountSheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */; };
@@ -17,14 +17,13 @@
 		7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C172B7821C814B30077972A /* GSTableViewcontroller.swift */; };
 		7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */; };
 		7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */; };
+		7C34BA6921D6ACF300B172BF /* QRScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */; };
+		7C34BA6B21D6B74700B172BF /* UsualCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */; };
 		7C8F65A121C1EE0300B53883 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A021C1EE0300B53883 /* Data.swift */; };
 		7C8F65A321C1F8EA00B53883 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A221C1F8EA00B53883 /* Protocols.swift */; };
 		7C8F65A521C211C400B53883 /* SheetCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A421C211C400B53883 /* SheetCollectionViewController.swift */; };
-		7C8F65A921C2D48500B53883 /* EditItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A821C2D48500B53883 /* EditItemViewController.swift */; };
 		7C9D3BE821AE6D8400758C02 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C9D3BE721AE6D8400758C02 /* Assets.xcassets */; };
 		7C9D3BEA21AF207400758C02 /* ItemListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9D3BE921AF207400758C02 /* ItemListViewController.swift */; };
-		7CF7801621C1A47600228BF1 /* SheetListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF7801521C1A47600228BF1 /* SheetListViewController.swift */; };
-		7CF8B5CF21B82C28002ADB1E /* _EditItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF8B5CE21B82C28002ADB1E /* _EditItemViewController.swift */; };
 		7CF8B5D121B86582002ADB1E /* Addon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF8B5D021B86582002ADB1E /* Addon.swift */; };
 		7CF8B5D321B8D7E3002ADB1E /* PhotoHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF8B5D221B8D7E3002ADB1E /* PhotoHandler.swift */; };
 		7CF9847821C562A000B730CE /* FloatButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF9847721C562A000B730CE /* FloatButton.swift */; };
@@ -58,7 +57,7 @@
 		66B94E6B30401A71BE86D894 /* Pods-MoneyNoteTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoneyNoteTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-MoneyNoteTests/Pods-MoneyNoteTests.release.xcconfig"; sourceTree = "<group>"; };
 		713DBFCFC009298423891DC3 /* Pods_MoneyNoteTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MoneyNoteTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C012E0821AE1537008E8AA5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7C012E0A21AE1537008E8AA5 /* NewItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemViewController.swift; sourceTree = "<group>"; };
+		7C012E0A21AE1537008E8AA5 /* ItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemViewController.swift; sourceTree = "<group>"; };
 		7C012E0D21AE1537008E8AA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7C012E1221AE1538008E8AA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7C012E1421AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -73,14 +72,13 @@
 		7C19BD7A21C7532400F1B7CA /* MoneyNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsualListViewController.swift; sourceTree = "<group>"; };
 		7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScanViewController.swift; sourceTree = "<group>"; };
+		7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsualCollectionViewController.swift; sourceTree = "<group>"; };
 		7C8F65A021C1EE0300B53883 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		7C8F65A221C1F8EA00B53883 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
 		7C8F65A421C211C400B53883 /* SheetCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetCollectionViewController.swift; sourceTree = "<group>"; };
-		7C8F65A821C2D48500B53883 /* EditItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditItemViewController.swift; sourceTree = "<group>"; };
 		7C9D3BE721AE6D8400758C02 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7C9D3BE921AF207400758C02 /* ItemListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListViewController.swift; sourceTree = "<group>"; };
-		7CF7801521C1A47600228BF1 /* SheetListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetListViewController.swift; sourceTree = "<group>"; };
-		7CF8B5CE21B82C28002ADB1E /* _EditItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _EditItemViewController.swift; sourceTree = "<group>"; };
 		7CF8B5D021B86582002ADB1E /* Addon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Addon.swift; sourceTree = "<group>"; };
 		7CF8B5D221B8D7E3002ADB1E /* PhotoHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoHandler.swift; sourceTree = "<group>"; };
 		7CF9847721C562A000B730CE /* FloatButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatButton.swift; sourceTree = "<group>"; };
@@ -191,11 +189,12 @@
 			children = (
 				7C8F65A421C211C400B53883 /* SheetCollectionViewController.swift */,
 				7C9D3BE921AF207400758C02 /* ItemListViewController.swift */,
-				7C012E0A21AE1537008E8AA5 /* NewItemViewController.swift */,
-				7C8F65A821C2D48500B53883 /* EditItemViewController.swift */,
+				7C012E0A21AE1537008E8AA5 /* ItemViewController.swift */,
 				7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */,
 				7C172B7821C814B30077972A /* GSTableViewcontroller.swift */,
+				7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */,
 				7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */,
+				7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -225,8 +224,6 @@
 		7C8F65AA21C2DC9100B53883 /* Bkup */ = {
 			isa = PBXGroup;
 			children = (
-				7CF8B5CE21B82C28002ADB1E /* _EditItemViewController.swift */,
-				7CF7801521C1A47600228BF1 /* SheetListViewController.swift */,
 			);
 			path = Bkup;
 			sourceTree = "<group>";
@@ -464,6 +461,7 @@
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
@@ -472,6 +470,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -485,15 +484,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C34BA6921D6ACF300B172BF /* QRScanViewController.swift in Sources */,
 				7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */,
-				7CF7801621C1A47600228BF1 /* SheetListViewController.swift in Sources */,
-				7C012E0B21AE1537008E8AA5 /* NewItemViewController.swift in Sources */,
-				7CF8B5CF21B82C28002ADB1E /* _EditItemViewController.swift in Sources */,
+				7C012E0B21AE1537008E8AA5 /* ItemViewController.swift in Sources */,
 				7CF9847821C562A000B730CE /* FloatButton.swift in Sources */,
 				7C8F65A321C1F8EA00B53883 /* Protocols.swift in Sources */,
 				7CF8B5D321B8D7E3002ADB1E /* PhotoHandler.swift in Sources */,
-				7C8F65A921C2D48500B53883 /* EditItemViewController.swift in Sources */,
 				7C8F65A521C211C400B53883 /* SheetCollectionViewController.swift in Sources */,
+				7C34BA6B21D6B74700B172BF /* UsualCollectionViewController.swift in Sources */,
 				7C012E0921AE1537008E8AA5 /* AppDelegate.swift in Sources */,
 				7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */,
 				7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */,

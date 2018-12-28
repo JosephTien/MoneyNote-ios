@@ -10,6 +10,28 @@ import UIKit
 
 private let reuseIdentifiers = ["SheetCollectionCell", "SheetCollectionAddCell"]
 
+
+class SheetCollectionViewLayout:UICollectionViewFlowLayout{
+    
+    override func awakeFromNib() {
+        self.sectionInset = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5);
+        
+        self.minimumLineSpacing = 5
+        
+        self.itemSize = CGSize(
+            width: CGFloat(screenWidth)/2 - 10.0,
+            height: CGFloat(screenWidth)/32*9 - 10.0)
+        //headerReferenceSize = CGSize()
+        //footerReferenceSize = CGSize()
+    }
+    var screenWidth: CGFloat {
+        return UIScreen.main.bounds.width
+    }
+    var screenHeight: CGFloat {
+        return UIScreen.main.bounds.height
+    }
+}
+
 class SheetCollectionAddCell: UICollectionViewCell{
     var cellcomp_add:UILabel!
     override init(frame: CGRect) {
@@ -86,7 +108,7 @@ class SheetCollectionCell: UICollectionViewCell{
     }
 }
 
-class SheetCollectionViewController: UICollectionViewController {
+class SheetCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
 //
 //--------------------- My Variable ----------------------
     static var share: SheetCollectionViewController?
@@ -130,7 +152,7 @@ class SheetCollectionViewController: UICollectionViewController {
         
         alertController.addTextField {
             (textField: UITextField!) -> Void in
-            textField.placeholder = "帳務表單"
+            textField.placeholder = "帳冊名稱"
         }
         let tf = ((alertController.textFields?.first)! as UITextField)
         alertController.addAction(
@@ -259,6 +281,18 @@ class SheetCollectionViewController: UICollectionViewController {
             addNewSheet()
         }
     }
+    /*
+    override func collectionView(_ collectionView: UICollectionView,
+                        layout collectionViewLayout: UICollectionViewLayout,
+                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: screenWidth / 2, height: screenWidth / 32 * 9)
+    }
+ */
+    /*
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: screenWidth / 2, height: screenWidth / 32 * 9)
+    }
+     */
     // MARK: UICollectionViewDelegate
 
     /*

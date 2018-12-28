@@ -15,12 +15,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var currentSheetIdx: Int? = nil
     static var currentItemIdx: Int? = nil
     static var floatingController: FloatingController?
-    static var floatingButtons: [FloatButton?] = [nil,nil,nil]
+    static var floatingButtons: [FloatButton?] = [nil,nil,nil,nil]
 //---------------------------------------------
     func start(){
         DM.loadTable()
         DM.loadUsualList()
-        
+        //Initial The Floating Button
         AppDelegate.floatingController = FloatingController()
         let controller = AppDelegate.floatingController!
         AppDelegate.floatingButtons[0] =
@@ -32,9 +32,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppDelegate.floatingButtons[2] =
             FloatButton.init(frame: FloatButton.getFrame(controller, .BottomRight))
                 .set(controller.view, text: ""){}
-        for i in (0..<3){
+        AppDelegate.floatingButtons[3] =
+            FloatButton.init(frame: FloatButton.getFrame(controller, .full))
+                .set(controller.view, text: ""){}
+        //Modify the default style of full button
+        AppDelegate.floatingButtons[3]?.layer.borderWidth = 0
+        //Initial the point area of floating button
+        for i in (0..<4){
             AppDelegate.floatingController?.addButtonPoint(button: AppDelegate.floatingButtons[i]!)
         }
+        //Intial the action of Floating Button when Dialoag show
         DialogService.commonBeforeHandler = FloatingController.hide
         DialogService.commonFinalHandler = FloatingController.show
     }

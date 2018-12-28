@@ -8,7 +8,7 @@
 
 import UIKit
 
-class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtocol, MyDataProtocol {
+class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtocol, MyDataProtocol {
     
     @IBOutlet weak var field_io: UISegmentedControl!
     @IBOutlet weak var field_date: UITextField!
@@ -27,12 +27,44 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     @IBOutlet weak var tablecell_photo: UIView!
     @IBOutlet weak var image_photo: UIImageView!
     //*************** My Variable ***************//
+    enum Mode{
+        case view
+        case edit
+        case new
+    }
+    var mode: Mode = .view
     var datePickerService: DatePickerServic?
-    var editMode = true
     var image: UIImage? = nil
     var quickFillTargetTag = 0
+    var photo_edited = false
     //*************** MyUi ***************//
-    
+    func setFloatingButton(){
+        if(mode == .view){
+            _ = AppDelegate.floatingButtons[0]!.set(text: "ㄑ"){
+                self.navigationController?.popViewController(animated: false)
+            }
+            _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
+            _ = AppDelegate.floatingButtons[2]!.set(text: "✎"){
+                self.toggleMode()
+            }
+        }else{
+            _ = AppDelegate.floatingButtons[0]!.set(text: "✖"){
+                if(self.mode == .new){
+                    self.navigationController?.popViewController(animated: false)
+                }else{
+                    self.toggleMode()
+                }
+            }
+            _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
+            _ = AppDelegate.floatingButtons[2]!.set(text: "✔"){
+                if(self.mode == .new){
+                    self.addNewItem()
+                }else{
+                    self.toggleMode()
+                }
+            }
+        }
+    }
     func uiInit(){
         //Press retuen to close keyboard
         self.hideKeyboardWhenTappedAround()
@@ -61,25 +93,25 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         btn_usual_name.addTarget(self, action: #selector(openUaualList_name), for: .touchUpInside)
         _ = btn_usual_sort.setBlackText().setRoundStyle()
         btn_usual_sort.addTarget(self, action: #selector(openUaualList_sort), for: .touchUpInside)
-
-    }
-    func setFloatingButton(){
-        _ = AppDelegate.floatingButtons[0]!.set(text: "✖"){
-            self.navigationController?.popViewController(animated: false)
+        
+        //EditMode
+        if(AppDelegate.currentItemIdx! >= 0){
+            mode = .view
+            setFieldData()
+            enableFields(false)
+        }else{
+            mode = .new
         }
-        _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
-        _ = AppDelegate.floatingButtons[2]!.set(text: "✔"){
-            self.addNewItem()
-        }
     }
-    
     func uiChange(){
-        //tablecell_payer.isHidden = field_io.selectedSegmentIndex == 1
+        /*
+        tablecell_payer.isHidden = field_io.selectedSegmentIndex == 1
         tablecell_receipt.isHidden = field_io.selectedSegmentIndex == 1
         tablecell_photo.isHidden = field_io.selectedSegmentIndex == 1 || !field_receipt.isOn
         if(!field_receipt.isOn){
             image_photo.image = nil
         }
+         */
         if(field_io.selectedSegmentIndex == 0){
             label_state.text = "結清"
             field_payer.placeholder = "墊款人"
@@ -87,12 +119,12 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
             label_state.text = "入庫"
             field_payer.placeholder = "負責人"
         }
-        if(!editMode){
+        if(mode == .view){
             field_payer.placeholder = ""
         }
         if(image_photo.image == nil){
             self.btn_photo.layer.borderWidth = 1
-            if(btn_photo.isEnabled){
+            if(btn_photo.isEnabled && mode != .view){
                 btn_photo.setTitle("Load Picture...", for: .normal)
             }else{
                 btn_photo.setTitle("", for: .normal)
@@ -101,12 +133,31 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
             self.btn_photo.layer.borderWidth = 0
             btn_photo.setTitle("", for: .normal)
         }
-        
         image_photo.image = image
     }
     
+    func setFieldData(){
+        let item = DM.table[AppDelegate.currentSheetIdx!].items[AppDelegate.currentItemIdx!]
+        if item.amount >= 0.0{
+            field_io.selectedSegmentIndex = 1
+            field_amount.text = String(item.amount)
+        }else {
+            field_io.selectedSegmentIndex = 0
+            field_amount.text = String(-item.amount)
+        }
+        field_name.text = item.name
+        field_date.text = item.date
+        field_sort.text = item.sort
+        field_state.isOn = item.state
+        field_payer.text = item.payer
+        field_receipt.isOn = item.receipt
+        if let imageData = NSData(contentsOfFile: item.path){
+            image_photo.image = UIImage(data: imageData as Data)!
+            image = image_photo.image
+        }
+    }
+    
     func enableFields(_ state: Bool){
-        editMode = state
         field_io.isEnabled = state
         field_date.setEnable(state)
         field_name.setEnable(state)
@@ -156,10 +207,38 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
             DialogService(self).showDialog_done("新增成功!",nil)
         }
     }
+    
+    func toggleMode() {
+        if(mode == .view){
+            mode = .edit
+            enableFields(true)
+            setFloatingButton()
+            uiChange()
+        }else if(mode == .edit){
+            if(validateField()){
+                mode = .view
+                let index = AppDelegate.currentItemIdx!
+                editItem2List(index)
+                enableFields(false)
+                setFloatingButton()
+                uiChange()
+                DialogService(self).showDialog_done("修改成功!",nil){
+                    self.navigationController?.popViewController(animated: false)
+                }
+            }
+        }
+    }
+    func cancelEdit() {
+        self.setFloatingButton()
+        enableFields(false)
+        self.navigationItem.rightBarButtonItem?.title = "Edit"
+        self.navigationItem.rightBarButtonItem?.style = .plain
+    }
+    
     //*************** MyData ***************//
     func addItem2List(){
         var amount = (field_amount.text?.floatValue)!
-        if(field_io.selectedSegmentIndex==0 && amount < 0){ amount *= -1 }
+        if(field_io.selectedSegmentIndex==0 && amount > 0){ amount *= -1 }
         let url = image_photo.image?.saveImageToLocal()
         let sheetid = DM.getCurrentSheet()!.id
         let timestamp = Date().secondFrom1970()
@@ -181,7 +260,31 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         //currentSheetIndex
         DM.addItem(sheetIdx: AppDelegate.currentSheetIdx!, item: item)
     }
-    func editItem2List(_ index: Int) {}
+    func editItem2List(_ index: Int) {
+        let index = AppDelegate.currentItemIdx!
+        let item = DM.table[AppDelegate.currentSheetIdx!].items[index]
+        var url: String = item.path
+        if(photo_edited){
+            url = image_photo.image?.saveImageToLocal() ?? ""
+        }
+        var amount = (field_amount.text?.floatValue)!
+        if(field_io.selectedSegmentIndex==0 && amount > 0){amount *= -1}
+        let item_new = DS.Item(
+            id: item.id,
+            date: field_date.text,
+            name: field_name.text,
+            sort: field_sort.text,
+            state: field_state.isOn,
+            payer: field_payer.text,
+            reimburse: false,
+            receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
+            amount: amount,
+            path: url,
+            timestamp: Date().secondFrom1970(),
+            delete: false
+        )
+        DM.editItem(sheetIdx: AppDelegate.currentSheetIdx!, itemIdx: index, item: item_new)
+    }
     
     func deleteItem2List(_ index: Int) {}
     
@@ -189,16 +292,14 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
     @objc func switchChanged() {
         uiChange()
     }
-    
-    @IBAction func btn_add(_ sender: Any) {
-        addNewItem()
-    }
     @objc func loadPhoto(){
         FloatingController.hide()
         PhotoHandler.shared.showActionSheet(vc: self){
             FloatingController.show()
         }
+        self.photo_edited = false
         PhotoHandler.shared.imagePickedBlock = { (image) in
+            self.photo_edited = true
             self.image_photo.image = image
             self.image = image
             FloatingController.show()
@@ -211,21 +312,24 @@ class NewItemViewController: UITableViewController, UITextFieldDelegate, MyUiPro
         navigationController?.pushViewController(controller, animated: false)
     }
     @objc func openUaualList_sort(){
-        UsualListViewController.targetTag = 2
-        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualListViewController")
+        UsualCollectionViewController.targetTag = 2
+        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualCollectionViewController")
         navigationController?.pushViewController(controller, animated: false)
     }
-    
     func prepareUsual(){
         if(UsualListViewController.targetTag==1){
-            field_name.text = UsualListViewController.currentString
+            if(UsualListViewController.currentString != ""){
+                field_name.text = UsualListViewController.currentString
+            }
             UsualListViewController.targetTag = 0
             UsualListViewController.currentString = ""
         }
-        if(UsualListViewController.targetTag==2){
-            field_sort.text = UsualListViewController.currentString
-            UsualListViewController.targetTag = 0
-            UsualListViewController.currentString = ""
+        if(UsualCollectionViewController.targetTag==2){
+            if(UsualCollectionViewController.currentString != ""){
+                field_sort.text = UsualCollectionViewController.currentString
+            }
+            UsualCollectionViewController.targetTag = 0
+            UsualCollectionViewController.currentString = ""
         }
     }
     //*************** UiViewController ***************//

@@ -7,6 +7,7 @@ class FloatButton: UIButton{
         case BottomCenter
         case UpLeft
         case UpRight
+        case full
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -44,6 +45,8 @@ class FloatButton: UIButton{
         }
         else if position == .BottomCenter {
             return CGRect(x: w/2-buttonDiameter/2, y: h_d-fix, width: buttonDiameter, height: buttonDiameter)
+        }else if position == .full {
+            return CGRect(x: 0, y: 0, width: controller.view.frame.width, height: controller.view.frame.height)
         }
         return CGRect()
     }
@@ -91,7 +94,6 @@ private class FloatingWindow: UIWindow {
         return trigger
     }
 }
-
 class FloatingController: UIViewController {
     private let window = FloatingWindow()
     required init?(coder aDecoder: NSCoder) {
@@ -126,6 +128,13 @@ class FloatingController: UIViewController {
     static func show(){
         FloatingController.sharedInstance!.view.isHidden = false
         FloatingController.hideButtons(false)
+    }
+    static func showPartialButtons(_ bools: [Bool]){
+        FloatingController.sharedInstance!.view.isHidden = false
+        for (i, button) in FloatingController.sharedInstance!.window.buttons.enumerated(){
+            if (i > bools.count || !(button?.isEnabled)!){button?.isHidden = true}
+            else {button?.isHidden = !bools[i]}
+        }
     }
     static func coverAndShow(_ string: String){
         FloatingController.show()
