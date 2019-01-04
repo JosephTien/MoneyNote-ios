@@ -56,14 +56,43 @@ extension UITextField{
 }
 
 extension UITableViewCell{
-    func setCellStyle(){
+    func setCellStyle()->UIView{
         let f = frame
-        let container = UIView(frame: CGRect(x: f.minX+10, y: f.minY, width: f.width-20, height: f.height))
+        //let container = UIView(frame: CGRect(x: f.minX+10, y: f.minY, width: f.width-20, height: f.height))
+        let container = UIView()
         container.layer.cornerRadius = 5
         container.layer.borderWidth = 1
         container.setFloating()
         contentView.addSubview(container)
+        
+        container.translatesAutoresizingMaskIntoConstraints = false
+        let heightConstrain = NSLayoutConstraint(item: container, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute , multiplier: 1, constant: f.height)
+        let leftConstrain = NSLayoutConstraint(item: container, attribute: .leading, relatedBy: .equal, toItem: contentView, attribute: .leading, multiplier: 1, constant: 10)
+        let rightConstrain = NSLayoutConstraint(item: container, attribute: .trailing , relatedBy: .equal, toItem: contentView, attribute: .trailing, multiplier: 1, constant: -10)
+        contentView.addConstraint(heightConstrain)
+        contentView.addConstraint(leftConstrain)
+        contentView.addConstraint(rightConstrain)
+        return container
     }
+    
+    func setDeleteLine()->UIView{
+        let deleteLine = UIView()
+        deleteLine.layer.borderWidth = 1
+        deleteLine.setFloating()
+        contentView.addSubview(deleteLine)
+        
+        deleteLine.translatesAutoresizingMaskIntoConstraints = false
+        let heightConstrain = NSLayoutConstraint(item: deleteLine, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute , multiplier: 1, constant: 2)
+        let leftConstrain = NSLayoutConstraint(item: deleteLine, attribute: .leading, relatedBy: .equal, toItem: contentView, attribute: .leading, multiplier: 1, constant: 10)
+        let rightConstrain = NSLayoutConstraint(item: deleteLine, attribute: .trailing , relatedBy: .equal, toItem: contentView, attribute: .trailing, multiplier: 1, constant: -10)
+        let centerYConstrain = NSLayoutConstraint(item: deleteLine, attribute: .centerY , relatedBy: .equal, toItem: contentView, attribute: .centerY, multiplier: 1, constant: 0)
+        contentView.addConstraint(heightConstrain)
+        contentView.addConstraint(leftConstrain)
+        contentView.addConstraint(rightConstrain)
+        contentView.addConstraint(centerYConstrain)
+        return deleteLine
+    }
+    
 }
 
 extension UICollectionViewCell{
@@ -102,9 +131,23 @@ extension UIView{
         self.layer.borderWidth = 1
     }
     func alignCenter(to: UIView){
-        //imgQRCode.translatesAutoresizingMaskIntoConstraints = false //?
+        translatesAutoresizingMaskIntoConstraints = false
         to.addConstraint(NSLayoutConstraint(item: self, attribute: .centerX, relatedBy: .equal, toItem: to, attribute: .centerX, multiplier: 1, constant: 0))
         to.addConstraint(NSLayoutConstraint(item: self, attribute: .centerY, relatedBy: .equal, toItem: to, attribute: .centerY, multiplier: 1, constant: 0))
+    }
+    func fullWidth(to: UIView){
+        translatesAutoresizingMaskIntoConstraints = false
+        to.addConstraint(NSLayoutConstraint(item: self, attribute: .leading, relatedBy: .equal, toItem: to, attribute: .leading, multiplier: 1, constant: 0))
+        to.addConstraint(NSLayoutConstraint(item: self, attribute: .trailing , relatedBy: .equal, toItem: to, attribute: .trailing, multiplier: 1, constant: 0))
+    }
+    func fullWidth(to: UIView, space: CGFloat){
+        translatesAutoresizingMaskIntoConstraints = false
+        to.addConstraint(NSLayoutConstraint(item: self, attribute: .leading, relatedBy: .equal, toItem: to, attribute: .leading, multiplier: 1, constant: space))
+        to.addConstraint(NSLayoutConstraint(item: self, attribute: .trailing , relatedBy: .equal, toItem: to, attribute: .trailing, multiplier: 1, constant: -space))
+    }
+    func setHeightConstrain(to: UIView, height: CGFloat){
+        translatesAutoresizingMaskIntoConstraints = false
+        to.addConstraint(NSLayoutConstraint(item: self, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute , multiplier: 1, constant: height))
     }
 }
 

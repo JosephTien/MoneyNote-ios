@@ -1,11 +1,3 @@
-//
-//  UsualViewController.swift
-//  MoneyNote
-//
-//  Created by 田茂堯 on 2018/12/20.
-//  Copyright © 2018 JTien. All rights reserved.
-//
-
 import UIKit
 
 class UsualListCell: UITableViewCell {
@@ -18,7 +10,7 @@ class UsualListCell: UITableViewCell {
         msgLabel.textAlignment = .center
         msgLabel.textColor = UIColor.black
         contentView.addSubview(msgLabel)
-        setCellStyle()
+        _ = setCellStyle()
         // Initialization code
     }
     override func setSelected(_ selected: Bool, animated: Bool) {

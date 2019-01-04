@@ -1,11 +1,3 @@
-//
-//  SheetCollectionViewController.swift
-//  AccountSheet
-//
-//  Created by 田茂堯 on 2018/12/12.
-//  Copyright © 2018 JTien. All rights reserved.
-//
-
 import UIKit
 
 private let reuseIdentifiers = ["SheetCollectionCell", "SheetCollectionAddCell"]
@@ -328,7 +320,7 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
 class Toolbar: UIToolbar {
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         var newSize: CGSize = super.sizeThatFits(size)
-        newSize.height = FloatButton.buttonDiameter+FloatButton.fix * 2
+        newSize.height = AppDelegate.toolBarHeight
         return newSize
     }
 }

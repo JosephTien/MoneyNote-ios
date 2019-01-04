@@ -2,7 +2,7 @@ import GoogleAPIClientForREST
 import GoogleSignIn
 import UIKit
 
-class ProfileViewController: GSTableViewcontroller{
+class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
     
     @IBOutlet weak var label_calculate: UITextField!
     @IBOutlet weak var label_wallet: UITextField!
@@ -18,6 +18,13 @@ class ProfileViewController: GSTableViewcontroller{
 //************** My UI function **************
     func uiInit(){
         setButtonStyle(btn_sync)
+        label_calculate.setEnable(false)
+        label_wallet.setEnable(false)
+        label_sync.setEnable(false)
+        //label_name.setEnable(false)
+        label_name.delegate = self
+        label_name.returnKeyType = .done
+        label_name.addTarget(self, action: #selector(editName), for: .editingDidBegin)
     }
     
     func uiChange(){
@@ -31,6 +38,10 @@ class ProfileViewController: GSTableViewcontroller{
         }else{
             label_sync.text = "尚未連動"
         }
+    }
+    
+    @objc func editName(){
+        label_name.setEnable(true)
     }
     
     func setButtonStyle(_ button: UIButton){
@@ -103,7 +114,13 @@ class ProfileViewController: GSTableViewcontroller{
         )
     }
     
-    @IBAction func btn_usual_item(_ sender: Any) {
+//*************** UITextFieldDelegate ***************//
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        DM.table[AppDelegate.currentSheetIdx!].sheet.name = label_name.text!
+        DM.saveSheets()
+        label_name.setEnable(false)
+        return false
     }
     
 //************** Data Maintain function **************
@@ -265,7 +282,9 @@ class ProfileViewController: GSTableViewcontroller{
             
             actionSheet.addAction(UIAlertAction(title: "Show QRcode", style: .default, handler: { (alert:UIAlertAction!) -> Void in
                 //FloatingController.show()
-                self.showQRCode(sheet.spreadSheet)
+                DialogService(self).showDialog_done("提示", "若要向他人分享帳冊，您必須至該Google Sheet的設定中將其Google Account加入為協作者，或是將共用模式設定為「知道連結的人皆可編輯」", action: {
+                        self.showQRCode(sheet.spreadSheet)
+                    })
             }))
             
             actionSheet.addAction(UIAlertAction(title: "Unlink", style: .default, handler: { (alert:UIAlertAction!) -> Void in
@@ -469,13 +488,17 @@ class ProfileViewController: GSTableViewcontroller{
     }
 }
 
-//Todo: note
-//Todo: Edit ListName
-//Todo: privage
-//Todo: Add Sort
-//Todo: view by sort
-//Todo: Sort
-//Todo: Firebase db
-//Todo: view Photo
+//Todo: multiple Photo
+//Todo: Note
+
+//Shirnk
+//sideView 多重模式
+//快速檢視尚未結清
+//快速輸入 記憶模式
+
+//檢視比較模式
+
 //Todo: ActionSheetModule
-//English
+//Todo: privage
+//Todo: English
+//Todo: Firebase db

@@ -13,10 +13,13 @@
 		7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E1121AE1538008E8AA5 /* LaunchScreen.storyboard */; };
 		7C012E1E21AE1538008E8AA5 /* AccountSheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */; };
 		7C012E2921AE1538008E8AA5 /* AccountSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */; };
-		7C172B7721C811070077972A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C172B7621C811070077972A /* GoogleService-Info.plist */; };
+		7C0D783821DC647E007DFB6A /* SideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0D783721DC647D007DFB6A /* SideViewController.swift */; };
+		7C0D783A21DC6B22007DFB6A /* SideConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0D783921DC6B22007DFB6A /* SideConfigViewController.swift */; };
 		7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C172B7821C814B30077972A /* GSTableViewcontroller.swift */; };
 		7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */; };
 		7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */; };
+		7C2FF99F21DAA5CB00800877 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C2FF99E21DAA5CA00800877 /* GoogleService-Info.plist */; };
+		7C315C3521DD33BA0020CD52 /* SideFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C315C3421DD33BA0020CD52 /* SideFilterViewController.swift */; };
 		7C34BA6921D6ACF300B172BF /* QRScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */; };
 		7C34BA6B21D6B74700B172BF /* UsualCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */; };
 		7C8F65A121C1EE0300B53883 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F65A021C1EE0300B53883 /* Data.swift */; };
@@ -65,13 +68,16 @@
 		7C012E1F21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSheetUITests.swift; sourceTree = "<group>"; };
 		7C012E2A21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7C0D783721DC647D007DFB6A /* SideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideViewController.swift; sourceTree = "<group>"; };
+		7C0D783921DC6B22007DFB6A /* SideConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideConfigViewController.swift; sourceTree = "<group>"; };
 		7C172B7021C7F8CF0077972A /* MoneyNoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoneyNoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C172B7121C7F8CF0077972A /* MoneyNoteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MoneyNoteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7C172B7621C811070077972A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7C172B7821C814B30077972A /* GSTableViewcontroller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GSTableViewcontroller.swift; sourceTree = "<group>"; };
 		7C19BD7A21C7532400F1B7CA /* MoneyNote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoneyNote.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsualListViewController.swift; sourceTree = "<group>"; };
 		7C2F89A521B9F247005B0E07 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		7C2FF99E21DAA5CA00800877 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7C315C3421DD33BA0020CD52 /* SideFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideFilterViewController.swift; sourceTree = "<group>"; };
 		7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScanViewController.swift; sourceTree = "<group>"; };
 		7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsualCollectionViewController.swift; sourceTree = "<group>"; };
 		7C8F65A021C1EE0300B53883 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
@@ -156,7 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				7C012E1421AE1538008E8AA5 /* Info.plist */,
-				7C172B7621C811070077972A /* GoogleService-Info.plist */,
+				7C2FF99E21DAA5CA00800877 /* GoogleService-Info.plist */,
 				7C9D3BE721AE6D8400758C02 /* Assets.xcassets */,
 				7C8F65AA21C2DC9100B53883 /* Bkup */,
 				7C8F659F21C1EC4400B53883 /* App */,
@@ -195,6 +201,9 @@
 				7C34BA6821D6ACF300B172BF /* QRScanViewController.swift */,
 				7C2F4FC421CC31AA004D642A /* UsualListViewController.swift */,
 				7C34BA6A21D6B74700B172BF /* UsualCollectionViewController.swift */,
+				7C0D783721DC647D007DFB6A /* SideViewController.swift */,
+				7C0D783921DC6B22007DFB6A /* SideConfigViewController.swift */,
+				7C315C3421DD33BA0020CD52 /* SideFilterViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -338,7 +347,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */,
-				7C172B7721C811070077972A /* GoogleService-Info.plist in Resources */,
+				7C2FF99F21DAA5CB00800877 /* GoogleService-Info.plist in Resources */,
 				7C9D3BE821AE6D8400758C02 /* Assets.xcassets in Resources */,
 				7C012E0E21AE1537008E8AA5 /* Main.storyboard in Resources */,
 			);
@@ -458,19 +467,27 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-MoneyNote/Pods-MoneyNote-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Cache/Cache.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Imaginary/Imaginary.framework",
+				"${BUILT_PRODUCTS_DIR}/Lightbox/Lightbox.framework",
 				"${BUILT_PRODUCTS_DIR}/QRCodeReader.swift/QRCodeReader.framework",
+				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cache.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Imaginary.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lightbox.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCodeReader.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -487,13 +504,16 @@
 				7C34BA6921D6ACF300B172BF /* QRScanViewController.swift in Sources */,
 				7C2F4FC521CC31AA004D642A /* UsualListViewController.swift in Sources */,
 				7C012E0B21AE1537008E8AA5 /* ItemViewController.swift in Sources */,
+				7C0D783A21DC6B22007DFB6A /* SideConfigViewController.swift in Sources */,
 				7CF9847821C562A000B730CE /* FloatButton.swift in Sources */,
 				7C8F65A321C1F8EA00B53883 /* Protocols.swift in Sources */,
+				7C0D783821DC647E007DFB6A /* SideViewController.swift in Sources */,
 				7CF8B5D321B8D7E3002ADB1E /* PhotoHandler.swift in Sources */,
 				7C8F65A521C211C400B53883 /* SheetCollectionViewController.swift in Sources */,
 				7C34BA6B21D6B74700B172BF /* UsualCollectionViewController.swift in Sources */,
 				7C012E0921AE1537008E8AA5 /* AppDelegate.swift in Sources */,
 				7C2F89A621B9F247005B0E07 /* ProfileViewController.swift in Sources */,
+				7C315C3521DD33BA0020CD52 /* SideFilterViewController.swift in Sources */,
 				7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */,
 				7CF8B5D121B86582002ADB1E /* Addon.swift in Sources */,
 				7C8F65A121C1EE0300B53883 /* Data.swift in Sources */,

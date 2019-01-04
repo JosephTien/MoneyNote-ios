@@ -1,13 +1,5 @@
-//
-//  ViewController.swift
-//  AccountSheet
-//
-//  Created by 田茂堯 on 2018/11/27.
-//  Copyright © 2018 JTien. All rights reserved.
-//
-
 import UIKit
-
+import Lightbox
 class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtocol, MyDataProtocol {
     
     @IBOutlet weak var field_io: UISegmentedControl!
@@ -52,7 +44,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
                 if(self.mode == .new){
                     self.navigationController?.popViewController(animated: false)
                 }else{
-                    self.toggleMode()
+                    self.cancelEdit()
                 }
             }
             _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
@@ -72,6 +64,11 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         self.field_payer.delegate = self
         self.field_amount.delegate = self
         
+        self.field_name.returnKeyType = .done
+        self.field_sort.returnKeyType = .done
+        self.field_payer.returnKeyType = .done
+        self.field_amount.returnKeyType = .done
+        
         //hide payer view_payer and picture
         switchChanged()
         field_io.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
@@ -86,7 +83,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         datePickerService = DatePickerServic(self, field_date).showDatePicker()
         
         //Photo Picker
-        btn_photo.addTarget(self, action: #selector(loadPhoto), for: UIControl.Event.primaryActionTriggered)
+        btn_photo.addTarget(self, action: #selector(clickPhoto), for: UIControl.Event.primaryActionTriggered)
         
         //set usual btn
         _ = btn_usual_name.setBlackText().setRoundStyle()
@@ -114,7 +111,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
          */
         if(field_io.selectedSegmentIndex == 0){
             label_state.text = "結清"
-            field_payer.placeholder = "墊款人"
+            field_payer.placeholder = "付款人"
         }else{
             label_state.text = "入庫"
             field_payer.placeholder = "負責人"
@@ -137,7 +134,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     }
     
     func setFieldData(){
-        let item = DM.table[AppDelegate.currentSheetIdx!].items[AppDelegate.currentItemIdx!]
+        let item = DM.getCurrentItem()!
         if item.amount >= 0.0{
             field_io.selectedSegmentIndex = 1
             field_amount.text = String(item.amount)
@@ -167,7 +164,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         field_payer.setEnable(state)
         field_receipt.isEnabled = state
         field_amount.setEnable(state)
-        btn_photo.isEnabled = state
+        //btn_photo.isEnabled = state
         btn_usual_name.isHidden = !state
         btn_usual_sort.isHidden = !state
         if(state){
@@ -194,6 +191,9 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     func validateField() -> Bool{
         if(field_date.text==""||field_name.text==""||field_amount.text==""){
             DialogService(self).showDialog_failed("部分欄位不允許為空", nil)
+            return false
+        }else if(Float(field_amount.text!)==0){
+            DialogService(self).showDialog_failed("金額不得為零", nil)
             return false
         }else{
             return true
@@ -229,6 +229,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         }
     }
     func cancelEdit() {
+        mode = .view
         self.setFloatingButton()
         enableFields(false)
         self.navigationItem.rightBarButtonItem?.title = "Edit"
@@ -250,7 +251,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             state: field_state.isOn,
             payer: field_payer.text,
             reimburse: false,
-            receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
+            receipt: field_receipt.isOn,
             amount: amount,
             path: (url ?? ""),
             timestamp: timestamp,
@@ -266,6 +267,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         var url: String = item.path
         if(photo_edited){
             url = image_photo.image?.saveImageToLocal() ?? ""
+            self.photo_edited = false
         }
         var amount = (field_amount.text?.floatValue)!
         if(field_io.selectedSegmentIndex==0 && amount > 0){amount *= -1}
@@ -277,7 +279,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             state: field_state.isOn,
             payer: field_payer.text,
             reimburse: false,
-            receipt: field_receipt.isOn || field_io.selectedSegmentIndex == 1,
+            receipt: field_receipt.isOn,
             amount: amount,
             path: url,
             timestamp: Date().secondFrom1970(),
@@ -292,17 +294,47 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     @objc func switchChanged() {
         uiChange()
     }
-    @objc func loadPhoto(){
+    @objc func clickPhoto(){
+        if(mode == .view){
+            viewPhoto()
+        }else{
+            loadPhoto()
+        }
+    }
+    func loadPhoto(){
         FloatingController.hide()
         PhotoHandler.shared.showActionSheet(vc: self){
             FloatingController.show()
         }
-        self.photo_edited = false
+        //self.photo_edited = false
         PhotoHandler.shared.imagePickedBlock = { (image) in
             self.photo_edited = true
             self.image_photo.image = image
             self.image = image
             FloatingController.show()
+        }
+    }
+    func viewPhoto(){
+        if let image = self.image{
+            let images = [
+                LightboxImage(
+                image: image,
+                text: ""
+                )
+            ]
+            // Create an instance of LightboxController.
+            let controller = LightboxController(images: images)
+            controller.footerView.isHidden = true
+            
+            // Set delegates.
+            controller.pageDelegate = self
+            controller.dismissalDelegate = self
+            
+            // Use dynamic background.
+            controller.dynamicBackground = true
+            
+            // Present your controller.
+            present(controller, animated: true, completion: nil)
         }
     }
     
@@ -352,5 +384,20 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         return false
+    }
+}
+
+
+extension ItemViewController: LightboxControllerPageDelegate {
+    
+    func lightboxController(_ controller: LightboxController, didMoveToPage page: Int) {
+        print(page)
+    }
+}
+
+extension ItemViewController: LightboxControllerDismissalDelegate {
+    
+    func lightboxControllerWillDismiss(_ controller: LightboxController) {
+        // ...
     }
 }

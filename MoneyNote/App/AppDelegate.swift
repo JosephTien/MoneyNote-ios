@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  AccountSheet
-//
-//  Created by 田茂堯 on 2018/11/27.
-//  Copyright © 2018 JTien. All rights reserved.
-//
 import Google
 import GoogleSignIn
 import UIKit
@@ -16,6 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var currentItemIdx: Int? = nil
     static var floatingController: FloatingController?
     static var floatingButtons: [FloatButton?] = [nil,nil,nil,nil]
+    static let toolBarHeight = FloatButton.buttonDiameter+FloatButton.fix * 2
+    static let statusBarHeight = CGFloat(20)
 //---------------------------------------------
     func start(){
         DM.loadTable()

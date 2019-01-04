@@ -8,6 +8,7 @@ target 'MoneyNote' do
     pod 'GoogleAPIClientForREST/Sheets', '~> 1.2.1'
     pod 'Google/SignIn', '~> 3.0.3'
     pod 'QRCodeReader.swift'
+    pod 'Lightbox'
   
   target 'MoneyNoteTests' do
     inherit! :search_paths

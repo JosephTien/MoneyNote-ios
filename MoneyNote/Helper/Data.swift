@@ -191,9 +191,7 @@ class DM{
         saveItems(sheetIdx: sheetIdx)
     }
     static func editItem(sheetIdx: Int, itemIdx: Int, item: DS.Item){
-        if(item.path==""){
-            table[sheetIdx].items[itemIdx].deleteImageFile()
-        }
+        table[sheetIdx].items[itemIdx].deleteImageFile()
         var item_new = item
         item_new.timestamp = Date().secondFrom1970()
         table[sheetIdx].items[itemIdx] = item_new
