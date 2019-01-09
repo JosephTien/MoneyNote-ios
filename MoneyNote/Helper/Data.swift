@@ -117,10 +117,26 @@ class DS{//DataStructure
             }
             return (count, cash)
         }
+        func statue()->(Int, Int){
+            var notPaid = 0
+            var noReceipt = 0
+            for item in items{
+                if(!item.delete){
+                    if(!item.state){
+                        notPaid = notPaid + 1
+                    }
+                    if(!item.receipt){
+                        noReceipt = noReceipt + 1
+                    }
+                }
+            }
+            return (notPaid, noReceipt)
+        }
     }
     struct UsualList: Codable{
         var strings:[String] = []
         var sorts:[String] = []
+        var users:[String] = []
         static let documentsDirectory = FileManager.default.urls(for: .documentDirectory,
                                                                  in: .userDomainMask).first!
         static let propertyEncoder = PropertyListEncoder()
@@ -167,6 +183,22 @@ class DM{
                 )
             }
         }
+    }
+    static func addSort(_ sort: String){
+        usualList.sorts = [sort] + usualList.sorts
+        usualList.saveToFile()
+    }
+    static func deleteSort(_ idx: Int){
+        usualList.sorts.remove(at: idx)
+        usualList.saveToFile()
+    }
+    static func addUser(_ user: String){
+        usualList.users = [user] + usualList.users
+        usualList.saveToFile()
+    }
+    static func deleteUser(_ idx: Int){
+        usualList.users.remove(at: idx)
+        usualList.saveToFile()
     }
     static func deleteItem(sheetIdx: Int, itemIdx: Int){
         //soft delete

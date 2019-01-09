@@ -103,7 +103,7 @@ class FloatingController: UIViewController {
     var msgLabel = UILabel()
     init() {
         super.init(nibName: nil, bundle: nil)
-        window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude)
+        window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude - 1)
         window.isHidden = false
         window.rootViewController = self
         FloatingController.sharedInstance = self

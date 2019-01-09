@@ -43,7 +43,8 @@ class GSTableViewcontroller: UITableViewController, GIDSignInDelegate, GIDSignIn
         GIDSignIn.sharedInstance().delegate = self
         GIDSignIn.sharedInstance().uiDelegate = self
         GIDSignIn.sharedInstance().scopes = scopes
-        GIDSignIn.sharedInstance().signOut()
+        GIDSignIn.sharedInstance().signOut() // always Restart
+        //GIDSignIn.sharedInstance()?.signInSilently() // keep session
     }
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!,
               withError error: Error!) {
@@ -147,6 +148,7 @@ class GSTableViewcontroller: UITableViewController, GIDSignInDelegate, GIDSignIn
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
     }
+    
     // **********************************
     // Followings are the Default Example
     // **********************************

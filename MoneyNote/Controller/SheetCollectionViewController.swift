@@ -12,7 +12,7 @@ class SheetCollectionViewLayout:UICollectionViewFlowLayout{
         
         self.itemSize = CGSize(
             width: CGFloat(screenWidth)/2 - 10.0,
-            height: CGFloat(screenWidth)/32*9 - 10.0)
+            height: CGFloat(screenWidth)/32*10 - 10.0) // 16:10
         //headerReferenceSize = CGSize()
         //footerReferenceSize = CGSize()
     }
@@ -53,6 +53,10 @@ class SheetCollectionCell: UICollectionViewCell{
     var cellcomp_cash:UILabel!
     var cellcomp_text_count:UILabel!
     var cellcomp_text_cash:UILabel!
+    var cellcomp_paid:UILabel!
+    var cellcomp_text_paid:UILabel!
+    var cellcomp_receipt:UILabel!
+    var cellcomp_text_receipt:UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -63,36 +67,65 @@ class SheetCollectionCell: UICollectionViewCell{
         let h = self.bounds.height
         let w = self.bounds.width
         
-        cellcomp_title = UILabel(frame:CGRect(x: 0, y: 0, width: w, height: h/3))
+        cellcomp_title = UILabel(frame:CGRect(x: 0, y: 0, width: w, height: h/4))
         cellcomp_title.textAlignment = .center
         cellcomp_title.textColor = UIColor.black
         cellcomp_title.font = UIFont.boldSystemFont(ofSize: 16)
         
-        cellcomp_count = UILabel(frame:CGRect(x: 0, y: h/3, width: w-9, height: h/3))
+        cellcomp_count = UILabel(frame:CGRect(x: 0, y: h/4, width: w-9, height: h/4))
         cellcomp_count.textAlignment = .right
         //cellcomp_count.textColor = UIColor.blue
         cellcomp_count.textColor = UIColor.black
         
-        cellcomp_cash = UILabel(frame:CGRect(x: 0, y: h/3*2, width: w-9, height: h/3))
+        cellcomp_cash = UILabel(frame:CGRect(x: 0, y: h/4*2, width: w-9, height: h/4))
         cellcomp_cash.textAlignment = .right
         //cellcomp_cash.textColor = UIColor.blue
         cellcomp_count.textColor = UIColor.black
         
-        cellcomp_text_count = UILabel(frame:CGRect(x: 9, y: h/3, width: w-9, height: h/3))
+        cellcomp_text_count = UILabel(frame:CGRect(x: 9, y: h/4, width: w-9, height: h/4))
         cellcomp_text_count.textAlignment = .left
         cellcomp_text_count.textColor = UIColor.black
         cellcomp_text_count.text = "小計："
         
-        cellcomp_text_cash = UILabel(frame:CGRect(x: 9, y: h/3*2, width: w-9, height: h/3))
+        cellcomp_text_cash = UILabel(frame:CGRect(x: 9, y: h/4*2, width: w-9, height: h/4))
         cellcomp_text_cash.textAlignment = .left
         cellcomp_text_cash.textColor = UIColor.black
         cellcomp_text_cash.text = "現金："
+        
+        //-------------------------------------------
+        
+        cellcomp_paid = UILabel(frame:CGRect(x: 9, y: h/4*3, width: (w-9)/4, height: h/4))
+        cellcomp_paid.textAlignment = .right
+        //cellcomp_count.textColor = UIColor.blue
+        cellcomp_paid.textColor = UIColor.black
+        
+        cellcomp_receipt = UILabel(frame:CGRect(x: 9 + (w-9)/2, y: h/4*3, width: (w-9)/4, height: h/4))
+        cellcomp_receipt.textAlignment = .right
+        //cellcomp_cash.textColor = UIColor.blue
+        cellcomp_receipt.textColor = UIColor.black
+        
+        cellcomp_text_paid = UILabel(frame:CGRect(x: 9 + (w-9)/4, y: h/4*3, width: (w-9)/4, height: h/4))
+        
+        cellcomp_text_paid.textAlignment = .left
+        cellcomp_text_paid.textColor = UIColor.black
+        cellcomp_text_paid.text = "○"
+        
+        cellcomp_text_receipt = UILabel(frame:CGRect(x: 9 + (w-9)/4*3, y: h/4*3, width: (w-9)/4, height: h/4))
+        
+        cellcomp_text_receipt.textAlignment = .left
+        cellcomp_text_receipt.textColor = UIColor.black
+        cellcomp_text_receipt.text = "◇"
+        
         
         self.addSubview(cellcomp_title)
         self.addSubview(cellcomp_count)
         self.addSubview(cellcomp_cash)
         self.addSubview(cellcomp_text_count)
         self.addSubview(cellcomp_text_cash)
+        self.addSubview(cellcomp_paid)
+        self.addSubview(cellcomp_receipt)
+        self.addSubview(cellcomp_text_paid)
+        self.addSubview(cellcomp_text_receipt)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -106,6 +139,7 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
     static var share: SheetCollectionViewController?
     
     @IBOutlet var viewDetail: UILongPressGestureRecognizer!
+    
     //--------------------- UI Function ----------------------
     func setToolBar(){//set here since it is the first controller instance
         let toolbar = self.navigationController!.toolbar!
@@ -161,7 +195,7 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
             ){(action: UIAlertAction!) -> Void in
                 let name = tf.text!
                 if(name == ""){
-                    DialogService(self).showDialog_failed("不允許為空", nil)
+                    DialogService.showDialog_failed("不允許為空", nil)
                     return
                 }
                 let id  = Int(Date().timeIntervalSince1970)
@@ -190,21 +224,10 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
                 AppDelegate.currentSheetIdx = indexPath.item - 1
                 if(AppDelegate.currentSheetIdx!<0){return}
                 
-                DialogService(self).showDialog_comfirm("確定要刪除嗎？",""){
+                DialogService.showDialog_comfirm("確定要刪除嗎？",""){
                     DM.deleteSheet(sheetIdx: AppDelegate.currentSheetIdx!)
                     self.collectionView.deleteItems(at: [indexPath])
                 }
-                /*
-                if let vc1 = self.storyboard?.instantiateViewController(withIdentifier: "ShowList") as?  ItemListViewController, let vc2 = self.storyboard?.instantiateViewController(withIdentifier: "ShowProfile") as? ProfileViewController
-                {
-                    self.navigationController?.pushViewController(vc1, animated: false)
-                    self.navigationController?.pushViewController(vc2, animated: false)
-                }
-                else{
-                    fatalError("Nil")
-                }
-                */
-                
             }
         }
     }
@@ -246,6 +269,9 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
             cell.cellcomp_title.text =  DM.table[idx].sheet.name
             cell.cellcomp_count.text = String(count)
             cell.cellcomp_cash.text = String(cash)
+            let (notPaid, noReceipt) = DM.table[idx].statue()
+            cell.cellcomp_paid.text = String(notPaid)
+            cell.cellcomp_receipt.text = String(noReceipt)
             setCellStyle(cell)
             return cell
         }else if(idx == -1){
@@ -279,7 +305,7 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: screenWidth / 2, height: screenWidth / 32 * 9)
     }
- */
+     */
     /*
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: screenWidth / 2, height: screenWidth / 32 * 9)

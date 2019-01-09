@@ -13,12 +13,12 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     @IBOutlet weak var label_state: UILabel!
     @IBOutlet weak var btn_photo: UIButton!
     @IBOutlet weak var btn_usual_name: UIButton!
-    @IBOutlet weak var btn_usual_sort: UIButton!
     @IBOutlet weak var tablecell_payer: UIView!
     @IBOutlet weak var tablecell_receipt: UITableViewCell!
     @IBOutlet weak var tablecell_photo: UIView!
     @IBOutlet weak var image_photo: UIImageView!
-    //*************** My Variable ***************//
+    
+//*************** My Variable ***************//
     enum Mode{
         case view
         case edit
@@ -29,7 +29,8 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     var image: UIImage? = nil
     var quickFillTargetTag = 0
     var photo_edited = false
-    //*************** MyUi ***************//
+    
+//*************** MyUi ***************//
     func setFloatingButton(){
         if(mode == .view){
             _ = AppDelegate.floatingButtons[0]!.set(text: "ㄑ"){
@@ -45,6 +46,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
                     self.navigationController?.popViewController(animated: false)
                 }else{
                     self.cancelEdit()
+                    AD.sideFilterVC?.hide()
                 }
             }
             _ = AppDelegate.floatingButtons[1]!.set(text: ""){}
@@ -57,10 +59,33 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             }
         }
     }
+    func setSideConfig(){
+        let top = UIApplication.shared.statusBarFrame.height
+        let bottom = AppDelegate.toolBarHeight
+        
+        if(AD.sideFilterVC == nil){
+            AD.sideFilterVC = (storyboard?.instantiateViewController(withIdentifier: "SideFilterViewController") as! SideFilterViewController)
+            AD.sideFilterVC?.setMargin(top: top, bottom: bottom)
+            AD.sideFilterVC?.setRelation(position: .left, movement: .stay)
+        }
+        AD.sideFilterVC?.handler_filter = { filters in
+            if(AD.sideFilterVC?.mode == .sort){
+                self.field_sort.text = filters[0]
+                self.field_amount.becomeFirstResponder()
+                AD.sideFilterVC?.toggle(to: false)
+            }else{
+                self.field_payer.text = filters[0]
+                AD.sideFilterVC?.toggle(to: false)
+            }
+            
+        }
+    }
+    
     func uiInit(){
         //Press retuen to close keyboard
         self.hideKeyboardWhenTappedAround()
         self.field_name.delegate = self
+        self.field_sort.delegate = self
         self.field_payer.delegate = self
         self.field_amount.delegate = self
         
@@ -68,12 +93,17 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         self.field_sort.returnKeyType = .done
         self.field_payer.returnKeyType = .done
         self.field_amount.returnKeyType = .done
+        self.field_date.tag = 0
+        self.field_name.tag = 1
+        self.field_sort.tag = 2
+        self.field_amount.tag = 3
+        self.field_payer.tag = 4
         
         //hide payer view_payer and picture
-        switchChanged()
-        field_io.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-        field_state.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
-        field_receipt.addTarget(self, action: #selector(switchChanged), for: UIControl.Event.valueChanged)
+        uiChange()
+        field_io.addAction(for: .valueChanged){ self.uiChange() }
+        field_state.addAction(for: .valueChanged){ self.uiChange() }
+        field_receipt.addAction(for: .valueChanged){ self.uiChange() }
         
         //photo button
         btn_photo.layer.borderWidth = 1
@@ -83,13 +113,21 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         datePickerService = DatePickerServic(self, field_date).showDatePicker()
         
         //Photo Picker
-        btn_photo.addTarget(self, action: #selector(clickPhoto), for: UIControl.Event.primaryActionTriggered)
+        btn_photo.addAction(for: .primaryActionTriggered){
+            if(self.mode == .view){
+                self.viewPhoto()
+            }else{
+                self.loadPhoto()
+            }
+        }
         
         //set usual btn
         _ = btn_usual_name.setBlackText().setRoundStyle()
-        btn_usual_name.addTarget(self, action: #selector(openUaualList_name), for: .touchUpInside)
-        _ = btn_usual_sort.setBlackText().setRoundStyle()
-        btn_usual_sort.addTarget(self, action: #selector(openUaualList_sort), for: .touchUpInside)
+        btn_usual_name.addAction(for: .touchUpInside){
+            UsualListViewController.targetTag = 1
+            let controller: UsualListViewController = UIStoryboard(.Main).instantiateViewController()
+            self.navigationController?.pushViewController(controller, animated: false)
+        }
         
         //EditMode
         if(AppDelegate.currentItemIdx! >= 0){
@@ -99,16 +137,20 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         }else{
             mode = .new
         }
+        
+        //Auto Jump
+        field_amount?.addDoneCancelToolbar(onDone: (target: self, action: #selector(jumpToPayer)))
+        if(mode == .new){
+            datePickerService?.doneHandler = {self.field_name.becomeFirstResponder()}
+            let date = Date()
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy/MM/dd"
+            field_date.text = formatter.string(from: date)
+            field_name.becomeFirstResponder()
+        }
+        
     }
     func uiChange(){
-        /*
-        tablecell_payer.isHidden = field_io.selectedSegmentIndex == 1
-        tablecell_receipt.isHidden = field_io.selectedSegmentIndex == 1
-        tablecell_photo.isHidden = field_io.selectedSegmentIndex == 1 || !field_receipt.isOn
-        if(!field_receipt.isOn){
-            image_photo.image = nil
-        }
-         */
         if(field_io.selectedSegmentIndex == 0){
             label_state.text = "結清"
             field_payer.placeholder = "付款人"
@@ -166,7 +208,6 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         field_amount.setEnable(state)
         //btn_photo.isEnabled = state
         btn_usual_name.isHidden = !state
-        btn_usual_sort.isHidden = !state
         if(state){
             btn_photo.setTitle("Load Picture...", for: .normal)
             field_payer.placeholder = field_io.selectedSegmentIndex == 0 ? "墊款人" : "負責人"
@@ -190,10 +231,10 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     
     func validateField() -> Bool{
         if(field_date.text==""||field_name.text==""||field_amount.text==""){
-            DialogService(self).showDialog_failed("部分欄位不允許為空", nil)
+            DialogService.showDialog_failed("部分欄位不允許為空", nil)
             return false
         }else if(Float(field_amount.text!)==0){
-            DialogService(self).showDialog_failed("金額不得為零", nil)
+            DialogService.showDialog_failed("金額不得為零", nil)
             return false
         }else{
             return true
@@ -204,7 +245,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             addItem2List()
             clearFields()
             self.navigationController?.popViewController(animated: false)
-            DialogService(self).showDialog_done("新增成功!",nil)
+            DialogService.showDialog_done("新增成功!",nil)
         }
     }
     
@@ -222,8 +263,8 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
                 enableFields(false)
                 setFloatingButton()
                 uiChange()
-                DialogService(self).showDialog_done("修改成功!",nil){
-                    self.navigationController?.popViewController(animated: false)
+                DialogService.showDialog_done("修改成功!",nil){
+                    //self.navigationController?.popViewController(animated: false)
                 }
             }
         }
@@ -236,7 +277,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         self.navigationItem.rightBarButtonItem?.style = .plain
     }
     
-    //*************** MyData ***************//
+//*************** MyData ***************//
     func addItem2List(){
         var amount = (field_amount.text?.floatValue)!
         if(field_io.selectedSegmentIndex==0 && amount > 0){ amount *= -1 }
@@ -290,17 +331,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     
     func deleteItem2List(_ index: Int) {}
     
-    //*************** Signal Function ***************//
-    @objc func switchChanged() {
-        uiChange()
-    }
-    @objc func clickPhoto(){
-        if(mode == .view){
-            viewPhoto()
-        }else{
-            loadPhoto()
-        }
-    }
+//*************** Signal Function ***************//
     func loadPhoto(){
         FloatingController.hide()
         PhotoHandler.shared.showActionSheet(vc: self){
@@ -337,17 +368,6 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             present(controller, animated: true, completion: nil)
         }
     }
-    
-    @objc func openUaualList_name(){
-        UsualListViewController.targetTag = 1
-        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualListViewController")
-        navigationController?.pushViewController(controller, animated: false)
-    }
-    @objc func openUaualList_sort(){
-        UsualCollectionViewController.targetTag = 2
-        let controller = self.storyboard!.instantiateViewController(withIdentifier: "UsualCollectionViewController")
-        navigationController?.pushViewController(controller, animated: false)
-    }
     func prepareUsual(){
         if(UsualListViewController.targetTag==1){
             if(UsualListViewController.currentString != ""){
@@ -356,15 +376,15 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             UsualListViewController.targetTag = 0
             UsualListViewController.currentString = ""
         }
-        if(UsualCollectionViewController.targetTag==2){
+        if(UsualCollectionViewController.targetTag==1){
             if(UsualCollectionViewController.currentString != ""){
-                field_sort.text = UsualCollectionViewController.currentString
+                field_name.text = UsualCollectionViewController.currentString
             }
             UsualCollectionViewController.targetTag = 0
             UsualCollectionViewController.currentString = ""
         }
     }
-    //*************** UiViewController ***************//
+//*************** UiViewController ***************//
     override func viewDidLoad() {
         super.viewDidLoad()
         uiInit()
@@ -375,29 +395,61 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         setFloatingButton()
         prepareUsual()
         FloatingController.show()
+        setSideConfig()
+        AD.sideFilterVC?.belongTo(self)
+        AD.sideFilterVC?.multiMode = false
     }
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         FloatingController.hide()
+        AD.sideFilterVC?.hide()
     }
     
-    //*************** UITextFieldDelegate ***************//
+//*************** UITextFieldDelegate ***************//
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
+        if(mode == .new){
+            if (self.field_sort.tag == textField.tag + 1){
+                field_sort.becomeFirstResponder()
+                AD.sideFilterVC?.toggle(to: true)
+            }
+            if (self.field_amount.tag == textField.tag + 1){
+                self.field_amount.becomeFirstResponder()
+            }
+        }
         return false
     }
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if(textField.tag == 2){
+            self.view.endEditing(true)
+            AD.sideFilterVC?.setMode(.sort)
+            AD.sideFilterVC?.open()
+            return false
+        }
+        if(textField.tag == 4){
+            self.view.endEditing(true)
+            AD.sideFilterVC?.setMode(.user)
+            AD.sideFilterVC?.open()
+            return false
+        }
+        AD.sideFilterVC?.close()
+        return true
+    }
+    @objc func jumpToPayer(){
+        if(mode == .new){
+            self.field_payer.becomeFirstResponder()
+        }
+    }
+    
 }
 
 
 extension ItemViewController: LightboxControllerPageDelegate {
-    
     func lightboxController(_ controller: LightboxController, didMoveToPage page: Int) {
-        print(page)
+        //print(page)
     }
 }
 
 extension ItemViewController: LightboxControllerDismissalDelegate {
-    
-    func lightboxControllerWillDismiss(_ controller: LightboxController) {
-        // ...
-    }
+    func lightboxControllerWillDismiss(_ controller: LightboxController) { }
 }

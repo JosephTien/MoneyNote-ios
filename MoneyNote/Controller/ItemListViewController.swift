@@ -10,6 +10,9 @@ class ItemListCell: UITableViewCell {
     @IBOutlet weak var width_state: NSLayoutConstraint!
     @IBOutlet weak var width_receipt: NSLayoutConstraint!
     
+    @IBOutlet weak var space1: NSLayoutConstraint!
+    @IBOutlet weak var space3: NSLayoutConstraint!
+    @IBOutlet weak var space2: NSLayoutConstraint!
     let msgLabel = UILabel()
     var deleteLine = UIView()
     var container :UIView? = nil
@@ -70,9 +73,15 @@ class ItemListCell: UITableViewCell {
                 cellcomp_receipt.text = ""
                 width_state.constant = 0
                 width_receipt.constant = 0
+                space1.constant = 8
+                space2.constant = 0
+                space3.constant = 0
             }else{
                 width_state.constant = 16
                 width_receipt.constant = 16
+                space1.constant = 8
+                space2.constant = 8
+                space3.constant = 8
             }
             deleteLine.isHidden = !item.delete
         }
@@ -106,12 +115,13 @@ class ItemListViewController: UITableViewController {
     static var share: ItemListViewController?
     var visableItems: [Int] = []
     var showDeleted = false
-    var filters: [String] = []
+    
+    var sorts: [String] = []
+    var users: [String] = []
     var showType: SideConfigViewController.ShowType = .all
-    var sortMethod: SideConfigViewController.SortMethod = .none
+    var arrangeMethod: SideConfigViewController.ArrangeMethod = .none
+    var stateType: SideConfigViewController.StateType = .all
     var sortAsc = true
-    var sideConfigController: SideConfigViewController? = nil
-    var sideFilterController: SideFilterViewController? = nil
 //--------------------- UI Function ----------------------
     func uiInit(){
         self.navigationItem.title = DM.table[AppDelegate.currentSheetIdx!].sheet.name
@@ -124,35 +134,80 @@ class ItemListViewController: UITableViewController {
         let top = UIApplication.shared.statusBarFrame.height
         let bottom = AppDelegate.toolBarHeight
         
-        sideConfigController = (storyboard?.instantiateViewController(withIdentifier: "SideConfigViewController") as! SideConfigViewController)
-        sideConfigController?.setMargin(top: top, bottom: bottom)
-        sideConfigController?.setRelation(position: .right, movement: .shrink)
-        sideConfigController?.handler_deleted = { state in
-            self.toggleShowDeleted(to: state)
+        if(AD.sideConfigVC == nil){
+            AD.sideConfigVC = (UIStoryboard(.Main).instantiateViewController())
+            AD.sideConfigVC?.setMargin(top: top, bottom: bottom)
+            AD.sideConfigVC?.setRelation(position: .right, movement: .shrink)
+            AD.sideConfigVC?.handler_deleted = { state in
+                self.showDeleted = state
+                self.refreshList()
+            }
+            AD.sideConfigVC?.handler_sort = { state in
+                self.arrangeMethod = state
+                self.refreshList()
+            }
+            AD.sideConfigVC?.handler_io = { state in
+                self.showType = state
+                self.refreshList()
+            }
+            AD.sideConfigVC?.handler_state = { state in
+                self.stateType = state
+                self.refreshList()
+            }
+            AD.sideConfigVC?.handler_asc = { state in
+                self.sortAsc = state
+                self.refreshList()
+            }
+            AD.sideConfigVC?.handler_filt_sort = {
+                if(AD.sideFilterVC?.mode == .user){
+                    AD.sideFilterVC?.toggle(to: false, sec: 0.1){
+                        AD.sideFilterVC?.setMode(.sort)
+                        AD.sideFilterVC?.open()
+                    }
+                }else{
+                    AD.sideFilterVC?.toggle()
+                }
+            }
+            AD.sideConfigVC?.handler_filt_user = {
+                if(AD.sideFilterVC?.mode == .sort){
+                    AD.sideFilterVC?.toggle(to: false, sec: 0.1){
+                        AD.sideFilterVC?.setMode(.user)
+                        AD.sideFilterVC?.toggle(to: true)
+                    }
+                }else{
+                    AD.sideFilterVC?.toggle()
+                }
+            }
         }
-        sideConfigController?.handler_sort = { state in
-            self.sortMethod = state
-            self.refreshList()
+        if(AD.sideFilterVC == nil){
+            AD.sideFilterVC = UIStoryboard(.Main).instantiateViewController()
+            AD.sideFilterVC?.setMargin(top: top, bottom: bottom)
+            AD.sideFilterVC?.setRelation(position: .left, movement: .stay)
         }
-        sideConfigController?.handler_io = { state in
-            self.showType = state
-            self.refreshList()
-        }
-        sideConfigController?.handler_asc = { state in
-            self.sortAsc = state
-            self.refreshList()
-        }
-        sideConfigController?.handler_filt = {
-            self.sideFilterController?.toggle()
-        }
-        
-        sideFilterController = (storyboard?.instantiateViewController(withIdentifier: "SideFilterViewController") as! SideFilterViewController)
-        sideFilterController?.setMargin(top: top, bottom: bottom)
-        sideFilterController?.setRelation(position: .left, movement: .stay)
-        sideFilterController?.handler_filter = { filters in
-            self.filters = filters
-            self.refreshList()
-            self.sideConfigController?.btn_filt.setTitle(" \(filters.count) filters ", for: .normal)
+        AD.sideFilterVC?.handler_filter = { filters in
+            if(AD.sideFilterVC?.mode == .sort){
+                self.sorts = filters
+                self.refreshList()
+                if(filters.count==0){
+                    AD.sideConfigVC?.btn_sort.setTitle(" all sort ", for: .normal)
+                }else if (filters.count==1){
+                    AD.sideConfigVC?.btn_sort.setTitle(" 1 sort ", for: .normal)
+                }else{
+                    AD.sideConfigVC?.btn_sort.setTitle(" \(filters.count) sorts ", for: .normal)
+                }
+            }
+            if(AD.sideFilterVC?.mode == .user){
+                self.users = filters
+                self.refreshList()
+                if(filters.count==0){
+                    AD.sideConfigVC?.btn_user.setTitle(" all user ", for: .normal)
+                }else if (filters.count==1){
+                    AD.sideConfigVC?.btn_user.setTitle(" 1 user ", for: .normal)
+                }else{
+                    AD.sideConfigVC?.btn_user.setTitle(" \(filters.count) users ", for: .normal)
+                }
+            }
+            
         }
     }
     func setFloatingButton(){
@@ -160,9 +215,8 @@ class ItemListViewController: UITableViewController {
             self.navigationController?.popViewController(animated: false)
         }
         _ = AppDelegate.floatingButtons[1]!.set(text: "i"){
-            if let vc = self.storyboard?.instantiateViewController(withIdentifier: "ShowProfile") as?  ProfileViewController{
-                self.navigationController?.pushViewController(vc, animated: false)
-            }
+            let vc: ProfileViewController = UIStoryboard(.Main).instantiateViewController()
+            self.navigationController?.pushViewController(vc, animated: false)
         }
         _ = AppDelegate.floatingButtons[2]!.set(text: "≣"){
             self.showSideMenuBar()
@@ -181,20 +235,29 @@ class ItemListViewController: UITableViewController {
             if(showType == .outcome && item.amount > 0){
                 visable = false
             }
-            if(!filters.isEmpty && !filters.contains(item.sort!)){
+            if((stateType == .noReceipt || stateType == .bad) && item.receipt){
+                visable = false
+            }
+            if((stateType == .notPaid || stateType == .bad) && item.state){
+                visable = false
+            }
+            if(!sorts.isEmpty && !sorts.contains(item.sort!)){
+                visable = false
+            }
+            if(!users.isEmpty && !users.contains(item.payer!)){
                 visable = false
             }
             if(visable){
                 visableItems.append(idx)
             }
         }
-        sortList()
+        arrangeList()
     }
-    func sortList(){
+    func arrangeList(){
         visableItems.sort(by: {idxa, idxb in
             let itema = DM.table[AppDelegate.currentSheetIdx!].items[idxa]
             let itemb = DM.table[AppDelegate.currentSheetIdx!].items[idxb]
-            if sortMethod == .amount{
+            if arrangeMethod == .amount{
                 let a = itema.amount
                 let b = itemb.amount
                 if(sortAsc){
@@ -211,7 +274,7 @@ class ItemListViewController: UITableViewController {
             }
             var a: String
             var b: String
-            switch sortMethod{
+            switch arrangeMethod{
             case .date:
                 a = itema.date!
                 b = itemb.date!
@@ -240,16 +303,9 @@ class ItemListViewController: UITableViewController {
         self.assignVisableItems()
         self.tableView.reloadData()
     }
-    func toggleShowDeleted(){
-        self.showDeleted = !self.showDeleted
-        toggleShowDeleted(to: self.showDeleted)
-    }
-    func toggleShowDeleted(to: Bool){
-        self.showDeleted = to
-        refreshList()
-        //DialogService(self).showDialog_done((self.showDeleted ? "顯示":"隱藏") + "「已刪除項目」", nil)
-    }
-    func toggleCellMode(){
+    
+    func toggleCellMode(_ simpleMode: Bool){
+        ItemListCell.simpleMode = simpleMode
         for cell in tableView.visibleCells{
             if let customCell = cell as? ItemListCell {
                 customCell.setContent()
@@ -257,11 +313,10 @@ class ItemListViewController: UITableViewController {
         }
     }
     func showSideMenuBar(){
-        sideConfigController?.toggle()
-        ItemListCell.simpleMode = sideConfigController!.isOn
-        toggleCellMode()
-        if(!(sideConfigController!.isOn)){
-            sideFilterController?.toggle(to: false)
+        AD.sideConfigVC?.toggle()
+        self.toggleCellMode(AD.sideConfigVC!.isOn)
+        if(!(AD.sideConfigVC!.isOn)){
+            AD.sideFilterVC?.toggle(to: false)
         }
     }
 // -------------------- Data function --------------------
@@ -273,22 +328,26 @@ class ItemListViewController: UITableViewController {
         super.viewDidLoad()
         uiInit()
         dataInit()
-        setSideConfig()
     }
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         refreshList()
         uiChange()
         setFloatingButton()
         FloatingController.show()
         
-        sideConfigController?.create()
-        sideFilterController?.create()
+        setSideConfig()
+        AD.sideConfigVC?.belongTo(self)
+        AD.sideFilterVC?.belongTo(self)
+        AD.sideFilterVC?.multiMode = true
+        AD.sideFilterVC?.setMode(.sort)
     }
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         FloatingController.hide()
         
-        sideConfigController?.elimimate()
-        sideFilterController?.elimimate()
+        AD.sideConfigVC?.hide()
+        AD.sideFilterVC?.hide()
     }
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
@@ -315,21 +374,10 @@ class ItemListViewController: UITableViewController {
                 if(!self.showDeleted){
                     self.visableItems.remove(at: choosen)
                     self.tableView.deleteSections([indexPath.section], with: .fade)
-                    
                 }
             }
-            
-            //hard delete
-            //tableView.deleteSections([indexPath.section] , with: .fade)
         }
         return [delete]
-        /*
-        let share = UITableViewRowAction(style: .default, title: "Edit") { (action, indexPath) in
-            // share item at indexPath
-        }
-         share.backgroundColor = UIColor.lightGray
-         return [delete, share]
-        */
     }
     
     // MARK: - Table view data source
@@ -375,7 +423,7 @@ class ItemListViewController: UITableViewController {
             let item = DM.table[AppDelegate.currentSheetIdx!].items[idx]
             if(item.delete){return}
         }
-        if let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ItemViewController") as? ItemViewController {
+        if let viewController = UIStoryboard(.Main).instantiateViewController(withIdentifier: "ItemViewController") as? ItemViewController {
             if let navigator = navigationController {
                 navigator.pushViewController(viewController, animated: false)
             }

@@ -10,6 +10,9 @@ class SideViewController : UIViewController{
         case move
         case stay
     }
+    var animationHandler = {}
+    var windowMode = false
+    open var primary : UIViewController?
     private var position: Position = .right
     private var movement: Movement = .move
     private let screenSize = UIScreen.main.bounds.size
@@ -56,6 +59,7 @@ class SideViewController : UIViewController{
         }
         set{
             window?.backgroundColor = newValue
+            keyWindow?.backgroundColor = newValue
         }
     }
 //-------------------------------------------------------
@@ -69,11 +73,13 @@ class SideViewController : UIViewController{
         super.init(coder: aDecoder)
         //fatalError("init(coder:) has not been implemented")
     }
+    func belongTo(_ primary: UIViewController){
+        self.primary = primary
+        create()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = UIColor.white
-        
         if(view.subviews.count == 0){
             let v = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: UIScreen.main.bounds.height))
             v.backgroundColor = UIColor.black
@@ -106,6 +112,14 @@ class SideViewController : UIViewController{
         self.movement = movement
     }
     func create(){
+        if (windowMode){
+            create_windowMode()
+            return
+        }
+        keyWindow?.addSubview(self.view)
+        //toggle(to: false, sec: 0)
+    }
+    func create_windowMode(){
         if (window == nil){
             window = SideWindow(self)
             window!.windowLevel = UIWindow.Level(rawValue: keyWindow!.windowLevel.rawValue + 1)
@@ -113,14 +127,35 @@ class SideViewController : UIViewController{
             window!.isHidden = false
             window!.rootViewController = self
         }
-        
     }
     func elimimate(){
-        toggle(to: false)
-        window = nil
+        if (windowMode){
+            create_windowMode()
+            return
+        }
+        self.view.removeFromSuperview()
+        //toggle(to: false, sec: 0)
     }
+    func elimimate_windowMode(){
+        window = nil
+        toggle(to: false, sec: 0){}
+    }
+    
 //-------------------------------------------------------
     func initSideView(){
+        if(windowMode){
+            initSideView_windowMode()
+            return
+        }
+        showed = false
+        if(position == .left){
+            self.view.frame = CGRect(x: -sw, y: y, width: sw, height: sh)
+        }
+        if(position == .right){
+            self.view.frame = CGRect(x: w, y: y, width: sw, height: sh)
+        }
+    }
+    func initSideView_windowMode(){
         showed = false
         if(position == .left){
             window?.frame =  CGRect(x: -sw, y: 0, width: sw, height: h)
@@ -133,49 +168,114 @@ class SideViewController : UIViewController{
             //self.view.frame = CGRect(x: w, y: y, width: sw, height: sh)
         }
     }
+    func open(){
+        toggle(to: true)
+    }
+    func close(){
+        toggle(to: false)
+    }
+    func show(){
+        toggle(to: true, sec: 0){}
+    }
+    func hide(){
+        toggle(to: false, sec: 0){}
+    }
     func toggle(){
         toggle(to: !showed)
     }
     func toggle(to: Bool){
+        toggle(to: to, sec: 0.2){}
+    }
+    func toggle(to: Bool, sec: TimeInterval, complete: @escaping ()->()){
+        if(sec==0){
+            self.apply(to)
+        }else{
+            UIView.animate(withDuration: sec, animations: {
+                self.apply(to)
+            }){ _ in
+                complete()
+            }
+        }
+    }
+    func apply(_ to: Bool){
+        if(windowMode){
+            apply_windowMode(to)
+            return
+        }
         let changed = (showed != to)
         showed = to
         let s = self.showed
         let sw = self.sw
         let w = self.w
         let h = self.h
-        
-        UIView.animate(withDuration: 0.2, animations: {
-            if(self.position == .left){
-                self.window?.frame.origin = CGPoint(x: s ? 0: -sw, y: 0)
-                //self.view.frame.origin = CGPoint(x: s ? 0: -sw, y: y)
-                if(self.movement == .shrink){
-                     if(changed){
-                         let currentW = self.keyWindow!.frame.size.width
-                         self.keyWindow?.frame = CGRect(x: s ? sw : 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
-                     }
-                }
-                if(self.movement == .move){
-                    self.keyWindow?.frame.origin = CGPoint(x: s ? sw : 0, y: 0)
+        if(self.position == .left){
+            self.view.frame.origin = CGPoint(x: s ? 0: -sw, y: y)
+            if(self.movement == .shrink){
+                if(changed){
+                    let currentW = self.primary!.view.frame.size.width
+                    self.primary!.view.frame = CGRect(x: s ? sw : 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
                 }
             }
-            if(self.position == .right){
-                self.window?.frame.origin = CGPoint(x: s ? w - sw : w, y: 0)
-                //self.view.frame.origin = CGPoint(x: s ? w - sw : w, y: y)
-                if(self.movement == .shrink){
-                    if(changed){
-                        let currentW = self.keyWindow!.frame.size.width
-                        self.keyWindow?.frame = CGRect(x: 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
-                    }
-                }
-                if(self.movement == .move){
-                    self.keyWindow?.frame.origin = CGPoint(x: s ? -sw : 0, y: 0)
+            if(self.movement == .move){
+                self.primary!.view.frame.origin = CGPoint(x: s ? sw : 0, y: 0)
+            }
+        }
+        if(self.position == .right){
+            self.view.frame.origin = CGPoint(x: s ? w - sw : w, y: y)
+            if(self.movement == .shrink){
+                if(changed){
+                    let currentW = self.primary!.view.frame.size.width
+                    self.primary!.view.frame = CGRect(x: 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
                 }
             }
-            self.keyWindow?.layoutIfNeeded()
-        })
+            if(self.movement == .move){
+                self.primary!.view.frame.origin = CGPoint(x: s ? -sw : 0, y: 0)
+            }
+        }
+        self.primary!.view.layoutIfNeeded()
+        self.view.layoutIfNeeded()
+        self.animationHandler()
+    }
     
+    func apply_windowMode(_ to: Bool){
+        let changed = (showed != to)
+        showed = to
+        let s = self.showed
+        let sw = self.sw
+        let w = self.w
+        let h = self.h
+        if(self.position == .left){
+            self.window?.frame.origin = CGPoint(x: s ? 0: -sw, y: 0)
+            //self.view.frame.origin = CGPoint(x: s ? 0: -sw, y: y)
+            if(self.movement == .shrink){
+                if(changed){
+                    let currentW = self.keyWindow!.frame.size.width
+                    self.keyWindow?.frame = CGRect(x: s ? sw : 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
+                }
+            }
+            if(self.movement == .move){
+                self.keyWindow?.frame.origin = CGPoint(x: s ? sw : 0, y: 0)
+            }
+        }
+        if(self.position == .right){
+            self.window?.frame.origin = CGPoint(x: s ? w - sw : w, y: 0)
+            //self.view.frame.origin = CGPoint(x: s ? w - sw : w, y: y)
+            if(self.movement == .shrink){
+                if(changed){
+                    let currentW = self.keyWindow!.frame.size.width
+                    self.keyWindow?.frame = CGRect(x: 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
+                }
+            }
+            if(self.movement == .move){
+                self.keyWindow?.frame.origin = CGPoint(x: s ? -sw : 0, y: 0)
+            }
+        }
+        self.keyWindow?.layoutIfNeeded()
+        self.window?.layoutIfNeeded()
+        self.animationHandler()
     }
 }
+//-----------------------------------------------
 private class SideWindow: UIWindow {
     var sideController: SideViewController? = nil
     init(_ sideController: SideViewController) {
@@ -189,8 +289,10 @@ private class SideWindow: UIWindow {
     }
     
     fileprivate override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        var rect = sideController!.view.frame
-        rect.origin = CGPoint(x: 0, y: 0)
+        //var rect = sideController!.view.frame
+        //rect.origin = CGPoint(x: 0, y: 0)
+        //return rect.contains(point)
+        let rect = sideController!.view.frame
         return rect.contains(point)
     }
 }

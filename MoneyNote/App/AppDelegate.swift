@@ -2,6 +2,7 @@ import Google
 import GoogleSignIn
 import UIKit
 
+typealias AD = AppDelegate
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -11,6 +12,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var floatingButtons: [FloatButton?] = [nil,nil,nil,nil]
     static let toolBarHeight = FloatButton.buttonDiameter+FloatButton.fix * 2
     static let statusBarHeight = CGFloat(20)
+    static var sideConfigVC: SideConfigViewController? = nil
+    static var sideFilterVC: SideFilterViewController? = nil
 //---------------------------------------------
     func start(){
         DM.loadTable()
@@ -37,8 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             AppDelegate.floatingController?.addButtonPoint(button: AppDelegate.floatingButtons[i]!)
         }
         //Intial the action of Floating Button when Dialoag show
-        DialogService.commonBeforeHandler = FloatingController.hide
-        DialogService.commonFinalHandler = FloatingController.show
+        //DialogService.commonBeforeHandler = FloatingController.hide
+        //DialogService.commonFinalHandler = FloatingController.show
     }
     /*
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {

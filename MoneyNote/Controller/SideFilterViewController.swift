@@ -8,28 +8,49 @@
 
 import UIKit
 
+class SideFilterListCell: UITableViewCell{
+    var button = UIButton()
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        button.frame = contentView.frame
+        selectedBackgroundView = nil
+        contentView.addSubview(button)
+        button.setTitleColor(UIColor.black, for: .normal)
+    }
+}
+
 class SideFilterViewController: SideViewController, UITableViewDelegate, UITableViewDataSource {
 
-    var buttons = [UIButton?](repeating: nil, count: DM.usualList.sorts.count)
-    var states = [Bool](repeating: false, count: DM.usualList.sorts.count)
+    enum Mode{
+        case sort
+        case user
+    }
+    var mode: Mode = .sort
+    var multiMode = true
+    
+    var states: [Bool] = []
     var filters: [String] = []
-    var handler_filter : (([String])->()) = {filters in }
+    var list: [String] = []
+    
+    var handler_filter : (([String])->()) = {_ in }
+    
     @IBOutlet weak var tableview: UITableView!
+    
+    //-----------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
         tableview.delegate = self
         tableview.dataSource = self
-        // Do any additional setup after loading the view.
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         windowColor = UIColor.white
+        tableview.frame.size = view.frame.size
         setBorderStyle()
-        
-        buttons = [UIButton?](repeating: nil, count: DM.usualList.sorts.count)
-        states = [Bool](repeating: false, count: DM.usualList.sorts.count)
+        setMode(.sort)
     }
     
+    //-----------------------------------------------
     func setBorderStyle(){
         let borderView = UIView(frame: view.frame)
         borderView.frame.origin = CGPoint(x: 0, y: 0)
@@ -39,66 +60,125 @@ class SideFilterViewController: SideViewController, UITableViewDelegate, UITable
         view.addSubview(borderView)
         borderView.isUserInteractionEnabled = false
     }
-    /*
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 10
+    func setMode(_ mode: Mode){
+        self.mode = mode
+        reset()
+        tableview.reloadData()
     }
-     */
+    func addSort(){
+        DialogService.showDialog_input("新增類別", nil){string in
+            DM.addSort(string)
+            self.reset()
+            self.tableview.reloadData()
+        }
+    }
+    func addUser(){
+        DialogService.showDialog_input("新增人員", nil){string in
+            DM.addUser(string)
+            self.reset()
+            self.tableview.reloadData()
+        }
+    }
+    override func belongTo(_ primary: UIViewController) {
+        super.belongTo(primary)
+        reset()
+        tableview.reloadData()
+    }
+    func reset(){
+        if(mode == .sort){
+            list = DM.usualList.sorts
+        }
+        if(mode == .user){
+            list = DM.usualList.users
+        }
+        states = [Bool](repeating: false, count: list.count)
+        filters = []
+    }
     
+    //-----------------------------------------------
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return DM.usualList.sorts.count
+        return list.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let idx = indexPath.row
-        let text = DM.usualList.sorts[idx]
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SideFilterCell", for: indexPath)
-        if buttons[idx]==nil{
-            let btn = UIButton(frame: cell.contentView.frame)
-            btn.setTitle(text, for: .normal)
-            btn.setTitleColor(UIColor.black, for: .normal)
-            btn.addTarget(self, action: #selector(onClick(btn:)), for: .touchUpInside)
-            btn.tag = idx
-            cell.contentView.addSubview(btn)
-            buttons[idx] = btn
+        let idx = indexPath.row - 1
+        let cell = tableView.dequeueReusableCell(withIdentifier: "SideFilterListCell", for: indexPath) as! SideFilterListCell
+        
+        while(idx >= states.count){
+            states.append(false)
         }
-        cell.selectedBackgroundView = nil
+        var text = idx >= 0 ? list[idx] : "➕";
+        if(idx>=0 && states[idx]){text = "[ \(text) ]"}
+        cell.button.tag = idx
+        cell.button.setTitle(text, for: .normal)
+        if(cell.button.allTargets.count==0){
+            cell.button.addTarget(self, action: #selector(onClick(btn:)), for: .touchUpInside)
+            let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(onLong(_:)))
+            cell.button.addGestureRecognizer(longGesture)
+        }
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        if(indexPath.section<1){return []}
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        return [delete]
+    }
+    
     @objc func onClick(btn: UIButton){
         let idx = btn.tag
-        let text = DM.usualList.sorts[idx]
-        if(states[idx]){
-            btn.setTitle(text, for: .normal)
-            states[idx] = false
-            filters.removeAll(){str in
-                return str==text
+        if(idx < 0){
+            switch(mode){
+            case .sort: addSort()
+            case .user: addUser()
             }
-            handler_filter(filters)
-        }else{
-            btn.setTitle("[ \(text) ]", for: .normal)
-            states[idx] = true
-            filters.append(text)
-            handler_filter(filters)
+            return
         }
-        print(filters)
+        let text = list[idx]
+        if(multiMode){
+            if(states[idx]){
+                btn.setTitle(text, for: .normal)
+                states[idx] = false
+                filters.removeAll(){str in
+                    return str==text
+                }
+            }else{
+                btn.setTitle("[ \(text) ]", for: .normal)
+                states[idx] = true
+                filters.append(text)
+            }
+        }else{
+            reset()
+            filters = [text]
+        }
+        handler_filter(filters)
     }
+    
+    @objc func onLong(_ sender : UIGestureRecognizer){
+        let btn = sender.view as! UIButton
+        let idx = btn.tag
+        if(idx<0){return}
+        DialogService.showDialog_comfirm("確定要刪除嗎？",""){
+            switch(self.mode){
+            case .sort: DM.deleteSort(idx)
+            case .user: DM.deleteUser(idx)
+            }
+            self.list.remove(at: idx)
+            self.reset()
+            let indexPath = IndexPath(row: idx+1, section: 0)
+            self.tableview.deleteRows(at: [indexPath], with: .fade)
+            self.tableview.reloadData()
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 

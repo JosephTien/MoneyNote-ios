@@ -6,25 +6,36 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
     
     @IBOutlet weak var label_calculate: UITextField!
     @IBOutlet weak var label_wallet: UITextField!
- 
     @IBOutlet weak var label_sync: UITextField!
     @IBOutlet weak var label_name: UITextField!
     @IBOutlet weak var btn_sync: UIButton!
+    
+    @IBOutlet weak var label_receipt: UITextField!
+    
+    @IBOutlet weak var btn_analysis: UIButton!
+    @IBOutlet weak var label_paid: UITextField!
     //************* my Variable **************
     var listPickerService: ListPickerServic?
     var importSucceed = false
     var outportSucceed = false
     var qrAlert: UIAlertController?
+    
 //************** My UI function **************
     func uiInit(){
         setButtonStyle(btn_sync)
+        setButtonStyle(btn_analysis)
+        btn_analysis.addAction(for: .touchUpInside){
+            DialogService.showDialog_done("to be continue...", nil)
+        }
         label_calculate.setEnable(false)
         label_wallet.setEnable(false)
         label_sync.setEnable(false)
         //label_name.setEnable(false)
         label_name.delegate = self
         label_name.returnKeyType = .done
-        label_name.addTarget(self, action: #selector(editName), for: .editingDidBegin)
+        label_name.addAction(for: .editingDidEnd){
+            self.label_name.setEnable(true)
+        }
     }
     
     func uiChange(){
@@ -38,10 +49,6 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         }else{
             label_sync.text = "尚未連動"
         }
-    }
-    
-    @objc func editName(){
-        label_name.setEnable(true)
     }
     
     func setButtonStyle(_ button: UIButton){
@@ -71,13 +78,14 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         let sheetIdx = AppDelegate.currentSheetIdx!
         let (val_calculation,val_wallet) = DM.table[sheetIdx].calculate()
         label_calculate.text = String(val_calculation)
-        if(val_calculation<0){
-            label_calculate.textColor = UIColor.black
-        }else{
-            label_calculate.textColor = UIColor.black
-        }
+        label_calculate.textColor = UIColor.black
         label_wallet.text = String(val_wallet)
+        
+        let (notPaid, noReceipt) = DM.table[sheetIdx].statue()
+        label_paid.text = String(notPaid)
+        label_receipt.text = String(noReceipt)
     }
+    
 //************** Controller function **************
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,7 +105,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
     }
     @IBAction func btn_sync(_ sender: Any) {
         if(DM.table[AppDelegate.currentSheetIdx!].sheet.spreadSheet==""){
-            DialogService(self).showDialog_ask("尚未連動", "現在開始進行連動嗎？若為第一次匯出，建議選擇創建新表單。"){
+            DialogService.showDialog_ask("尚未連動", "現在開始進行連動嗎？若為第一次匯出，建議選擇創建新表單。"){
                 self.showActionSheet()
             }
             return
@@ -114,7 +122,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         )
     }
     
-//*************** UITextFieldDelegate ***************//
+//*************** UITextFieldDelegate ***************
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         DM.table[AppDelegate.currentSheetIdx!].sheet.name = label_name.text!
@@ -145,7 +153,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         updateSheet(spreadsheetId: DM.table[AppDelegate.currentSheetIdx!].sheet.spreadSheet,
             values: generateRawData(),
             succeedHandler: { _ in
-                //DialogService(self).showDialog_done("成功匯出", ""){}
+                //DialogService.showDialog_done("成功匯出", ""){}
                 //self.showAlert(title: "成功匯出", message: "")
                 self.outportSucceed = true
             },
@@ -171,7 +179,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                 DM.table[AppDelegate.currentSheetIdx!].sheet.lastSyncTime = dateString
                 self.label_sync.text = dateString
                 DM.saveSheets()
-                DialogService(self).showDialog_done("成功同步", "")
+                DialogService.showDialog_done("成功同步", "")
             }
         }
     }
@@ -184,7 +192,6 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         
         enterController.addTextField {
             (textField: UITextField!) -> Void in
-            //textField.text = "1qe7SYe0_dga995SksljixrPYoC7TOZjzlW5GV7bfuxE"
             textField.placeholder = "Google Sheet ID"
         }
         
@@ -204,21 +211,20 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                     FloatingController.show()
                     let spreadsheetId = tf.text!
                     if(spreadsheetId == ""){
-                        DialogService(self).showDialog_failed("不允許為空", nil)
+                        DialogService.showDialog_failed("不允許為空", nil)
                         return
                     }
                     DM.table[AppDelegate.currentSheetIdx!].sheet.spreadSheet = spreadsheetId
                     DM.saveSheets()
                     self.label_sync.text = "已連動，尚未同步"
-                    DialogService(self).showDialog_ok("提示", "已連動Google Sheet，可以開始進行同步"){
-                        DialogService(self).showDialog_ok("提醒", "您必須要有該表單的權限，且該表單必須符合自動生成的格式。"){}
+                    DialogService.showDialog_ok("提示", "已連動Google Sheet，可以開始進行同步"){
+                        DialogService.showDialog_ok("提醒", "您必須要有該表單的權限，且該表單必須符合自動生成的格式。"){}
                     }
                 }
             )
         )
-        //若要向他人分享帳冊，您必須至該Google Sheet的設定中將其Google Account加入為協作者，或是將共用模式設定為「知道連結的人皆可編輯」
         
-        DialogService(self).showDialog_ask("從剪貼簿複製ID？", ""){
+        DialogService.showDialog_ask("從剪貼簿複製ID？", ""){
             FloatingController.hide()
             tf.text = UIPasteboard.general.string
             self.present(
@@ -243,7 +249,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                         self.label_sync.text = "已連動"
                         DM.saveSheets()
                         //self.showAlert(title: "Created!", message: "")
-                        DialogService(self).showDialog_ok("提示", "已建立Google Sheet，可以開始進行同步"){}
+                        DialogService.showDialog_ok("提示", "已建立Google Sheet，可以開始進行同步"){}
                     },
                     finalHandler: {
                         FloatingController.cover(false)
@@ -276,13 +282,13 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             actionSheet.addAction(UIAlertAction(title: "Copy ID", style: .default, handler: { (alert:UIAlertAction!) -> Void in
                 FloatingController.show()
                 UIPasteboard.general.string = sheet.spreadSheet
-                DialogService(self).showDialog_done("Copied","")
+                DialogService.showDialog_done("Copied","")
                 //self.showAlert(title: "Copied", message: "")
             }))
             
             actionSheet.addAction(UIAlertAction(title: "Show QRcode", style: .default, handler: { (alert:UIAlertAction!) -> Void in
                 //FloatingController.show()
-                DialogService(self).showDialog_done("提示", "若要向他人分享帳冊，您必須至該Google Sheet的設定中將其Google Account加入為協作者，或是將共用模式設定為「知道連結的人皆可編輯」", action: {
+                DialogService.showDialog_ok("提示", "若要向他人分享帳冊，您必須至該Google Sheet的設定中將其Google Account加入為協作者，或是將共用模式設定為「知道連結的人皆可編輯」", function: {
                         self.showQRCode(sheet.spreadSheet)
                     })
             }))
@@ -291,7 +297,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                 FloatingController.show()
                 DM.table[AppDelegate.currentSheetIdx!].sheet.spreadSheet = ""
                 self.label_sync.text = "尚未連動"
-                DialogService(self).showDialog_done("Unlinked","")
+                DialogService.showDialog_done("Unlinked","")
                 DM.saveSheets()
             }))
         }else{
@@ -303,7 +309,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             
             actionSheet.addAction(UIAlertAction(title: "Link Current Sheet", style: .default, handler: { (alert:UIAlertAction!) -> Void in
                 FloatingController.show()
-                DialogService(self).showDialog_ask("注意", "除非該表單為本帳冊的原始表單，否則第一次同步至其他現有表單會混合本機資料和線上資料，請確定目標表單無誤。"){
+                DialogService.showDialog_ask("注意", "除非該表單為本帳冊的原始表單，否則第一次同步至其他現有表單會混合本機資料和線上資料，請確定目標表單無誤。"){
                     self.addSync()
                 }
             }))
@@ -314,7 +320,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                     self.navigationController!.popViewController(animated: false)
                     if(QRHelper.code != ""){
                         UIPasteboard.general.string = QRHelper.code
-                        DialogService(self).showDialog_done("ID已複製到剪貼簿","")//FloatingController.show() will execute
+                        DialogService.showDialog_done("ID已複製到剪貼簿","")//FloatingController.show() will execute
                     }else{
                         FloatingController.show()
                     }
@@ -337,7 +343,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             guard let _ = Float(row[6]),
                 let _ = Float(row[7]),
                 let _ = Int(row[12]) else{
-                    DialogService(self).showDialog_failed("格式有誤", "您可能曾手動修改表單內容但格式有誤。您可以手動修正錯誤，或是從重新建立新表單並同步。一般不建議手動修改表單。")
+                    DialogService.showDialog_failed("格式有誤", "您可能曾手動修改表單內容但格式有誤。您可以手動修正錯誤，或是從重新建立新表單並同步。一般不建議手動修改表單。")
                     return
             }
             let amount = Float(row[6])! - Float(row[7])!
@@ -372,7 +378,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         }
         DM.table[sheetIdx].items = items
         DM.saveItems(sheetIdx: sheetIdx)
-        //DialogService(self).showDialog_done("成功匯入", ""){}
+        //DialogService.showDialog_done("成功匯入", ""){}
         //self.showAlert(title: "成功匯入", message: "")
         self.importSucceed = true
     }
@@ -435,12 +441,6 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         qrAlert.view.addSubview(qrImageView)
         qrImageView.alignCenter(to: qrAlert.view)
         
-        /*
-        let dismissBtn = UIButton()
-        dismissBtn.frame.size = UIScreen.main.bounds.size//qrImageView.frame.size
-        dismissBtn.addTarget(self, action: #selector(dismissQRAlert), for: .touchUpInside)
-        qrAlert.view.addSubview(dismissBtn)
-         */
         self.qrAlert = qrAlert
         
         FloatingController.showPartialButtons([false,false,false,true])
@@ -454,24 +454,6 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             }
             
         }
-        
-        /*
-        let image = UIImage(color: UIColor.white, size: CGSize(width: width/2, height: width/2))?.alpha(0)
-        let alertAction = UIAlertAction(title: "", style: .default, handler: {_ in FloatingController.show()})
-        alertAction.setValue(image, forKey: "image")
-        alert.addAction(alertAction)
-         */
-        /*
-        alert.addAction(
-            UIAlertAction(
-                title: "OK",
-                style: .cancel,
-                handler: {_ in
-                    FloatingController.show()
-                }
-            )
-        )
-        */
         self.present(
             qrAlert,
             animated: true,
@@ -487,18 +469,3 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
         }
     }
 }
-
-//Todo: multiple Photo
-//Todo: Note
-
-//Shirnk
-//sideView 多重模式
-//快速檢視尚未結清
-//快速輸入 記憶模式
-
-//檢視比較模式
-
-//Todo: ActionSheetModule
-//Todo: privage
-//Todo: English
-//Todo: Firebase db
