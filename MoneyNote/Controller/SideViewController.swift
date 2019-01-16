@@ -11,14 +11,21 @@ class SideViewController : UIViewController{
         case stay
     }
     var animationHandler = {}
-    var windowMode = false
+    let windowMode = true
+    var focusMode = true
+    static private var animating = false
+    private var focused: Bool{
+        get{
+            return !SideWindow.currentFocusVCStack.isEmpty && SideWindow.currentFocusVCStack.last == self
+        }
+    }
     open var primary : UIViewController?
     private var position: Position = .right
     private var movement: Movement = .move
     private let screenSize = UIScreen.main.bounds.size
-    private var window: SideWindow? = nil
     private var sideWidth = CGFloat(0)
     private var showed = false
+    private var showed_prev = false
     private var topMargin = CGFloat(0)
     private var bottomMargin = CGFloat(0)
     private var keyWindow = UIApplication.shared.keyWindow
@@ -53,12 +60,16 @@ class SideViewController : UIViewController{
             return showed
         }
     }
+    private var window: SideWindow?{
+        get{
+            return SideWindow.shared
+        }
+    }
     var windowColor: UIColor?{
         get{
-            return window?.backgroundColor
+            return keyWindow?.backgroundColor
         }
         set{
-            window?.backgroundColor = newValue
             keyWindow?.backgroundColor = newValue
         }
     }
@@ -103,6 +114,16 @@ class SideViewController : UIViewController{
         initSideView()
     }
 //-------------------------------------------------------
+    static func lockAnimating()->Bool{
+        if(SideViewController.animating){return false}
+        else{
+            SideViewController.animating = true
+        }
+        return true
+    }
+    static func unlockAnimating(){
+        SideViewController.animating = false
+    }
     func setMargin(top: CGFloat, bottom: CGFloat){
         topMargin = top
         bottomMargin = bottom
@@ -117,36 +138,29 @@ class SideViewController : UIViewController{
             return
         }
         keyWindow?.addSubview(self.view)
-        //toggle(to: false, sec: 0)
     }
     func create_windowMode(){
         if (window == nil){
-            window = SideWindow(self)
-            window!.windowLevel = UIWindow.Level(rawValue: keyWindow!.windowLevel.rawValue + 1)
+            SideWindow.create()
+            window!.windowLevel = UIWindow.Level(rawValue: keyWindow!.windowLevel.rawValue + 2)
             //window!.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude)
             window!.isHidden = false
-            window!.rootViewController = self
         }
+        window?.addSubview(self.view)
+        SideWindow.addSideViewController(self)
     }
     func elimimate(){
-        if (windowMode){
-            create_windowMode()
-            return
-        }
-        self.view.removeFromSuperview()
-        //toggle(to: false, sec: 0)
-    }
-    func elimimate_windowMode(){
-        window = nil
         toggle(to: false, sec: 0){}
+        self.view.removeFromSuperview()
+        if (windowMode){
+            if(window?.subviews.count==0){
+                SideWindow.elimimate()
+            }
+        }
     }
     
 //-------------------------------------------------------
     func initSideView(){
-        if(windowMode){
-            initSideView_windowMode()
-            return
-        }
         showed = false
         if(position == .left){
             self.view.frame = CGRect(x: -sw, y: y, width: sw, height: sh)
@@ -154,7 +168,9 @@ class SideViewController : UIViewController{
         if(position == .right){
             self.view.frame = CGRect(x: w, y: y, width: sw, height: sh)
         }
+        
     }
+    /*
     func initSideView_windowMode(){
         showed = false
         if(position == .left){
@@ -168,6 +184,8 @@ class SideViewController : UIViewController{
             //self.view.frame = CGRect(x: w, y: y, width: sw, height: sh)
         }
     }
+    */
+    
     func open(){
         toggle(to: true)
     }
@@ -175,46 +193,53 @@ class SideViewController : UIViewController{
         toggle(to: false)
     }
     func show(){
+        view.isHidden = false
         toggle(to: true, sec: 0){}
     }
     func hide(){
+        view.isHidden = true
         toggle(to: false, sec: 0){}
     }
     func toggle(){
         toggle(to: !showed)
     }
-    func toggle(to: Bool){
-        toggle(to: to, sec: 0.2){}
+    
+    func toggle(to show: Bool){
+        view.isHidden = false
+        toggle(to: show, sec: 0.2){}
     }
-    func toggle(to: Bool, sec: TimeInterval, complete: @escaping ()->()){
+    
+    func toggle(to show: Bool, sec: TimeInterval, complete: @escaping ()->()){
+        if(show && focusMode && !focused){SideWindow.pushFocus(self)}
         if(sec==0){
-            self.apply(to)
+            self.showed = show
+            self.apply()
+            if(!show && focused){SideWindow.popFocus()}
         }else{
+            if(!SideViewController.lockAnimating()){return}
             UIView.animate(withDuration: sec, animations: {
-                self.apply(to)
+                self.showed = show
+                self.apply()
             }){ _ in
+                if(!show && self.focused){SideWindow.popFocus()}
+                SideViewController.unlockAnimating()
                 complete()
             }
         }
     }
-    func apply(_ to: Bool){
-        if(windowMode){
-            apply_windowMode(to)
-            return
-        }
-        let changed = (showed != to)
-        showed = to
-        let s = self.showed
+    
+    func apply(){
+        if(showed_prev == showed){return }
+        showed_prev = showed
+        let s = showed
         let sw = self.sw
         let w = self.w
         let h = self.h
         if(self.position == .left){
             self.view.frame.origin = CGPoint(x: s ? 0: -sw, y: y)
             if(self.movement == .shrink){
-                if(changed){
-                    let currentW = self.primary!.view.frame.size.width
-                    self.primary!.view.frame = CGRect(x: s ? sw : 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
-                }
+                let currentW = self.primary!.view.frame.size.width
+                self.primary!.view.frame = CGRect(x: s ? sw : 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
             }
             if(self.movement == .move){
                 self.primary!.view.frame.origin = CGPoint(x: s ? sw : 0, y: 0)
@@ -223,20 +248,24 @@ class SideViewController : UIViewController{
         if(self.position == .right){
             self.view.frame.origin = CGPoint(x: s ? w - sw : w, y: y)
             if(self.movement == .shrink){
-                if(changed){
-                    let currentW = self.primary!.view.frame.size.width
-                    self.primary!.view.frame = CGRect(x: 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
-                }
+                let currentW = self.primary!.view.frame.size.width
+                self.primary!.view.frame = CGRect(x: 0, y: 0, width: currentW + (s ? -sw : sw), height: h)
             }
             if(self.movement == .move){
                 self.primary!.view.frame.origin = CGPoint(x: s ? -sw : 0, y: 0)
             }
         }
+        if(s && focused){
+            SideWindow.blur(true)
+        }else{
+            SideWindow.blur(false)
+        }
+        
         self.primary!.view.layoutIfNeeded()
         self.view.layoutIfNeeded()
         self.animationHandler()
     }
-    
+    /*
     func apply_windowMode(_ to: Bool){
         let changed = (showed != to)
         showed = to
@@ -273,26 +302,87 @@ class SideViewController : UIViewController{
         self.keyWindow?.layoutIfNeeded()
         self.window?.layoutIfNeeded()
         self.animationHandler()
-    }
+     }
+ */
 }
 //-----------------------------------------------
-private class SideWindow: UIWindow {
-    var sideController: SideViewController? = nil
-    init(_ sideController: SideViewController) {
+class SideWindow: UIWindow {
+    private static var _shared: SideWindow? = nil
+    static var sideViewControllers: [SideViewController] = []
+    static var blurBack: UIView? = nil
+    static var currentFocusVCStack: [SideViewController] = []
+    static var shared: SideWindow?{
+        get{
+            return _shared
+        }
+    }
+    init() {
         super.init(frame: UIScreen.main.bounds)
         backgroundColor = nil
-        self.sideController = sideController
+        SideWindow.blurBack = UIView(frame: frame)
+        addSubview(SideWindow.blurBack!)
+        SideWindow.blurBack?.backgroundColor = UIColor.black
+        SideWindow.blurBack?.alpha = 0
+        windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude - 1)
     }
-    
+    static func addSideViewController(_ svc: SideViewController){
+        sideViewControllers.append(svc)
+    }
+    static func removeSideViewController(_ svc: SideViewController){
+        sideViewControllers = sideViewControllers.filter{$0 != svc}
+    }
+    static func create(){
+        if(_shared == nil){
+            _shared = SideWindow()
+        }
+    }
+    static func elimimate(){
+        _shared = nil
+    }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    fileprivate override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        //var rect = sideController!.view.frame
-        //rect.origin = CGPoint(x: 0, y: 0)
-        //return rect.contains(point)
-        let rect = sideController!.view.frame
-        return rect.contains(point)
+    static func blur(_ state: Bool){
+        if(state){
+            blurBack?.alpha = 0.5
+        }else{
+            blurBack?.alpha = 0
+        }
+    }
+    
+    static func pushFocus(_ svc: SideViewController){
+        currentFocusVCStack.append(svc)
+        shared?.bringSubviewToFront(blurBack!)
+        shared?.bringSubviewToFront(svc.view)
+    }
+    static func popFocus(){
+        currentFocusVCStack.removeLast()
+        if(!currentFocusVCStack.isEmpty){
+            shared?.bringSubviewToFront(blurBack!)
+            shared?.bringSubviewToFront(currentFocusVCStack.last!.view)
+        }
+    }
+    static func releaseFocus(){
+        currentFocusVCStack = []
+    }
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        if(SideWindow.currentFocusVCStack.isEmpty){
+            for view in self.subviews{
+                if view == SideWindow.blurBack {continue}
+                let rect = view.frame
+                if(rect.contains(point)){
+                    return true
+                }
+            }
+            return false
+        }else{
+            let svc = SideWindow.currentFocusVCStack.last!
+            let rect = svc.view.frame
+            if(!rect.contains(point)){
+                svc.close()
+            }
+            return true
+        }
     }
 }

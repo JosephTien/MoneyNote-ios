@@ -154,7 +154,10 @@ class DialogService {
         vc?.present(
             alertController,
             animated: true,
-            completion: nil
+            completion: {
+                print("Bring")
+                tf.becomeFirstResponder()
+            }
         )
     }
 }

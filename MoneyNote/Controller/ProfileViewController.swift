@@ -142,7 +142,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             finalHandler: {
                 FloatingController.cover(false)
                 after()
-                print("Leave inport")
+                print("Leave import")
             }
         )
     }
@@ -241,7 +241,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             succeedHandler: { _ in
                 FloatingController.show()
                 let idx = AppDelegate.currentSheetIdx!
-                FloatingController.cover(true)
+                FloatingController.coverAndShow("Creating...")
                 self.createSheet(name: DM.table[idx].sheet.name,
                      succeedHandler: { spreadSheet in
                         DM.table[idx].sheet.spreadSheet = spreadSheet as! String
@@ -348,7 +348,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             }
             let amount = Float(row[6])! - Float(row[7])!
             let new_item = DS.Item(
-                id: row[11],
+                id: row[12],
                 date: row[0],
                 name: row[1],
                 sort: row[2],
@@ -357,9 +357,10 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
                 reimburse: false,
                 receipt: row[5]=="Y",
                 amount: amount,
+                note: row[10],
                 path: "",
-                timestamp: Int(row[12])!,
-                delete: row[10]=="D"
+                timestamp: Int(row[13])!,
+                delete: row[11]=="D"
             )
             
             var found = false
@@ -385,7 +386,7 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
     
     func generateRawData()->[[String]]{
         var values:[[String]] = []
-        values.append(["日期", "項目", "類別", "墊款人/負責人", "結清?", "收據?", "收入", "支出", "小記", "現金", "Delete?", "id", "timestamp"])
+        values.append(["日期", "品名", "類別", "墊款人/負責人", "結清?", "單據?", "收入", "支出", "小記", "現金", "註記", "Delete?", "id", "timestamp"])
         for (idx, item) in DM.table[AppDelegate.currentSheetIdx!].items.enumerated(){
             let rowidx = idx+2
             var val_cal = "=G\(rowidx)-H\(rowidx)"
@@ -400,14 +401,14 @@ class ProfileViewController: GSTableViewcontroller, UITextFieldDelegate{
             }
             if (item.amount > 0){
                 values.append([item.date!, item.name!, item.sort!, item.payer!,
-                               item.state ? "Y":"N", "-", "\(item.amount)", "0",
-                               val_cal, val_wal,
+                               item.state ? "Y":"N", item.receipt ? "Y":"N", "\(item.amount)", "0",
+                               val_cal, val_wal, item.note!,
                                item.delete ? "D" : "", "\(item.id)", "\(item.timestamp)"])
             }else{
                 values.append([item.date!, item.name!, item.sort!, item.payer!,
                                item.state ? "Y":"N", item.receipt ? "Y":"N", "0", "\(-item.amount)",
-                    val_cal, val_wal,
-                    item.delete ? "D" : "", "\(item.id)", "\(item.timestamp)"])
+                               val_cal, val_wal, item.note!,
+                               item.delete ? "D" : "", "\(item.id)", "\(item.timestamp)"])
             }
         }
         return values

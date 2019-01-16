@@ -108,13 +108,13 @@ class SheetCollectionCell: UICollectionViewCell{
         
         cellcomp_text_paid.textAlignment = .left
         cellcomp_text_paid.textColor = UIColor.black
-        cellcomp_text_paid.text = "○"
+        cellcomp_text_paid.text = " ○"
         
         cellcomp_text_receipt = UILabel(frame:CGRect(x: 9 + (w-9)/4*3, y: h/4*3, width: (w-9)/4, height: h/4))
         
         cellcomp_text_receipt.textAlignment = .left
         cellcomp_text_receipt.textColor = UIColor.black
-        cellcomp_text_receipt.text = "◇"
+        cellcomp_text_receipt.text = " ◇"
         
         
         self.addSubview(cellcomp_title)
@@ -172,7 +172,7 @@ class SheetCollectionViewController: UICollectionViewController, UICollectionVie
     
     func addNewSheet() {
         let alertController = UIAlertController(
-            title: "新增",
+            title: "新增帳冊",
             message: "(ex:一月雜支、行銷活動)",
             preferredStyle: .alert)
         

@@ -11,6 +11,7 @@ class DS{//DataStructure
         var reimburse: Bool = false
         var receipt: Bool = false
         var amount: Float = 0.0
+        var note: String? = ""
         var path: String = ""
         var timestamp: Int = 0
         var delete: Bool = false

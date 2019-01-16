@@ -103,7 +103,7 @@ class FloatingController: UIViewController {
     var msgLabel = UILabel()
     init() {
         super.init(nibName: nil, bundle: nil)
-        window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude - 1)
+        window.windowLevel = UIWindow.Level(rawValue: CGFloat.greatestFiniteMagnitude - 2)
         window.isHidden = false
         window.rootViewController = self
         FloatingController.sharedInstance = self
@@ -204,6 +204,11 @@ class FloatingController: UIViewController {
         snapButtonToSocket()
     }
     
+     func keyboardDidShow(note: NSNotification) {
+        window.windowLevel = 0
+        window.windowLevel = CGFloat.max
+     }
+     
     private var sockets: [CGPoint] {
         let buttonSize = button.bounds.size
         let rect = view.bounds.insetBy(dx: 4 + buttonSize.width / 2, dy: 4 + buttonSize.height / 2)

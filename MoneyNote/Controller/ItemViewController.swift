@@ -10,6 +10,9 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     @IBOutlet weak var field_payer: UITextField!
     @IBOutlet weak var field_receipt: UISwitch!
     @IBOutlet weak var field_amount: UITextField!
+    
+    @IBOutlet weak var field_note: UITextField!
+    
     @IBOutlet weak var label_state: UILabel!
     @IBOutlet weak var btn_photo: UIButton!
     @IBOutlet weak var btn_usual_name: UIButton!
@@ -29,6 +32,8 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     var image: UIImage? = nil
     var quickFillTargetTag = 0
     var photo_edited = false
+    var autoJump = true
+    var autoStart = false
     
 //*************** MyUi ***************//
     func setFloatingButton(){
@@ -71,7 +76,9 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         AD.sideFilterVC?.handler_filter = { filters in
             if(AD.sideFilterVC?.mode == .sort){
                 self.field_sort.text = filters[0]
-                self.field_amount.becomeFirstResponder()
+                if(self.autoJump){
+                    self.field_amount.becomeFirstResponder()
+                }
                 AD.sideFilterVC?.toggle(to: false)
             }else{
                 self.field_payer.text = filters[0]
@@ -88,11 +95,13 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         self.field_sort.delegate = self
         self.field_payer.delegate = self
         self.field_amount.delegate = self
+        self.field_note.delegate = self
         
         self.field_name.returnKeyType = .done
         self.field_sort.returnKeyType = .done
         self.field_payer.returnKeyType = .done
         self.field_amount.returnKeyType = .done
+        self.field_note.returnKeyType = .done
         self.field_date.tag = 0
         self.field_name.tag = 1
         self.field_sort.tag = 2
@@ -141,12 +150,14 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         //Auto Jump
         field_amount?.addDoneCancelToolbar(onDone: (target: self, action: #selector(jumpToPayer)))
         if(mode == .new){
-            datePickerService?.doneHandler = {self.field_name.becomeFirstResponder()}
             let date = Date()
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy/MM/dd"
             field_date.text = formatter.string(from: date)
-            field_name.becomeFirstResponder()
+            if(autoStart){
+                datePickerService?.doneHandler = {self.field_name.becomeFirstResponder()}
+                field_name.becomeFirstResponder()
+            }
         }
         
     }
@@ -190,6 +201,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         field_state.isOn = item.state
         field_payer.text = item.payer
         field_receipt.isOn = item.receipt
+        field_note.text = item.note
         if let imageData = NSData(contentsOfFile: item.path){
             image_photo.image = UIImage(data: imageData as Data)!
             image = image_photo.image
@@ -206,6 +218,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         field_payer.setEnable(state)
         field_receipt.isEnabled = state
         field_amount.setEnable(state)
+        field_note.setEnable(state)
         //btn_photo.isEnabled = state
         btn_usual_name.isHidden = !state
         if(state){
@@ -263,6 +276,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
                 enableFields(false)
                 setFloatingButton()
                 uiChange()
+                AD.sideFilterVC?.hide()
                 DialogService.showDialog_done("修改成功!",nil){
                     //self.navigationController?.popViewController(animated: false)
                 }
@@ -294,6 +308,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             reimburse: false,
             receipt: field_receipt.isOn,
             amount: amount,
+            note: field_note.text,
             path: (url ?? ""),
             timestamp: timestamp,
             delete: false
@@ -322,6 +337,7 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
             reimburse: false,
             receipt: field_receipt.isOn,
             amount: amount,
+            note: field_note.text,
             path: url,
             timestamp: Date().secondFrom1970(),
             delete: false
@@ -395,9 +411,11 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
         setFloatingButton()
         prepareUsual()
         FloatingController.show()
+        
         setSideConfig()
         AD.sideFilterVC?.belongTo(self)
         AD.sideFilterVC?.multiMode = false
+        AD.sideFilterVC?.focusMode = true
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -406,15 +424,26 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     }
     
 //*************** UITextFieldDelegate ***************//
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if (range.location == textField.text?.count && string == " ") {
+            // ignore replacement string and add your own
+            textField.text = textField.text! + "\u{00a0}"
+            return false;
+        }
+        return true;
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
-        if(mode == .new){
-            if (self.field_sort.tag == textField.tag + 1){
-                field_sort.becomeFirstResponder()
-                AD.sideFilterVC?.toggle(to: true)
-            }
-            if (self.field_amount.tag == textField.tag + 1){
-                self.field_amount.becomeFirstResponder()
+        if(autoJump){
+            if(mode == .new){
+                if (self.field_sort.tag == textField.tag + 1){
+                    field_sort.becomeFirstResponder()
+                    AD.sideFilterVC?.toggle(to: true)
+                }
+                if (self.field_amount.tag == textField.tag + 1){
+                    self.field_amount.becomeFirstResponder()
+                }
             }
         }
         return false
@@ -437,7 +466,9 @@ class ItemViewController: UITableViewController, UITextFieldDelegate, MyUiProtoc
     }
     @objc func jumpToPayer(){
         if(mode == .new){
-            self.field_payer.becomeFirstResponder()
+            if(autoJump){
+                self.field_payer.becomeFirstResponder()
+            }
         }
     }
     

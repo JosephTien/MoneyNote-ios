@@ -106,7 +106,6 @@ class ItemListCell: UITableViewCell {
         msgLabel.text = "Deleted!"
         */
     }
-    
 }
 
 class ItemListViewController: UITableViewController {
@@ -127,9 +126,11 @@ class ItemListViewController: UITableViewController {
         self.navigationItem.title = DM.table[AppDelegate.currentSheetIdx!].sheet.name
         assignVisableItems()
     }
+    
     func uiChange(){
         
     }
+    
     func setSideConfig(){
         let top = UIApplication.shared.statusBarFrame.height
         let bottom = AppDelegate.toolBarHeight
@@ -210,6 +211,7 @@ class ItemListViewController: UITableViewController {
             
         }
     }
+    
     func setFloatingButton(){
         _ = AppDelegate.floatingButtons[0]!.set(text: "ㄑ"){
             self.navigationController?.popViewController(animated: false)
@@ -222,6 +224,15 @@ class ItemListViewController: UITableViewController {
             self.showSideMenuBar()
         }
     }
+    func initState(){
+        sorts = []
+        users = []
+        showType = .all
+        arrangeMethod = .none
+        stateType = .all
+        sortAsc = true
+    }
+    
     func assignVisableItems(){
         visableItems = []
         for (idx, item) in DM.table[AppDelegate.currentSheetIdx!].items.enumerated(){
@@ -253,6 +264,7 @@ class ItemListViewController: UITableViewController {
         }
         arrangeList()
     }
+    
     func arrangeList(){
         visableItems.sort(by: {idxa, idxb in
             let itema = DM.table[AppDelegate.currentSheetIdx!].items[idxa]
@@ -312,6 +324,7 @@ class ItemListViewController: UITableViewController {
             }
         }
     }
+    
     func showSideMenuBar(){
         AD.sideConfigVC?.toggle()
         self.toggleCellMode(AD.sideConfigVC!.isOn)
@@ -333,19 +346,24 @@ class ItemListViewController: UITableViewController {
         super.viewWillAppear(animated)
         refreshList()
         uiChange()
+        
         setFloatingButton()
         FloatingController.show()
         
+        initState()
+        toggleCellMode(false)
         setSideConfig()
         AD.sideConfigVC?.belongTo(self)
         AD.sideFilterVC?.belongTo(self)
+        AD.sideConfigVC?.focusMode = false
+        AD.sideFilterVC?.focusMode = true
         AD.sideFilterVC?.multiMode = true
         AD.sideFilterVC?.setMode(.sort)
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        FloatingController.hide()
         
+        FloatingController.hide()
         AD.sideConfigVC?.hide()
         AD.sideFilterVC?.hide()
     }

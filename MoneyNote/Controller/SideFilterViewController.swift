@@ -41,6 +41,8 @@ class SideFilterViewController: SideViewController, UITableViewDelegate, UITable
         super.viewDidLoad()
         tableview.delegate = self
         tableview.dataSource = self
+        view.backgroundColor = nil
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -59,6 +61,9 @@ class SideFilterViewController: SideViewController, UITableViewDelegate, UITable
         borderView.layer.cornerRadius = 15
         view.addSubview(borderView)
         borderView.isUserInteractionEnabled = false
+        
+        view.layer.cornerRadius = 15
+        tableview.layer.cornerRadius = 15
     }
     func setMode(_ mode: Mode){
         self.mode = mode

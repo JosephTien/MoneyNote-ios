@@ -171,9 +171,9 @@ extension UIControl {
         }
      }
  
-    func addAction(for: UIControl.Event, _ closure: @escaping UIControlTargetClosure) {
+    func addAction(for event: UIControl.Event, _ closure: @escaping UIControlTargetClosure) {
         targetClosure = closure
-        addTarget(self, action: #selector(UIButton.closureAction), for: .touchUpInside)
+        addTarget(self, action: #selector(UIButton.closureAction), for: event)
      }
     
     func setAction(for event: UIControl.Event, _ closure: @escaping UIControlTargetClosure) {

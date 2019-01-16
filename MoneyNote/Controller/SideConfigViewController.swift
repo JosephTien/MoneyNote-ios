@@ -55,6 +55,7 @@ class SideConfigViewController: SideViewController{
         btn_asc.addTarget(self, action: #selector(toggleAsc), for: .touchUpInside)
         btn_sort.addTarget(self, action: #selector(editFilter_sort), for: .touchUpInside)
         btn_user.addTarget(self, action: #selector(editFilter_user), for: .touchUpInside)
+        view.backgroundColor = nil
         //init
         reset()
     }
