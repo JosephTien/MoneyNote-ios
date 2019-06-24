@@ -1,6 +1,6 @@
 //
-//  AccountSheetUITests.swift
-//  AccountSheetUITests
+//  MoneyNoteUITests.swift
+//  MoneyNoteUITests
 //
 //  Created by 田茂堯 on 2018/11/27.
 //  Copyright © 2018 JTien. All rights reserved.
@@ -8,7 +8,7 @@
 
 import XCTest
 
-class AccountSheetUITests: XCTestCase {
+class MoneyNoteUITests: XCTestCase {
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.

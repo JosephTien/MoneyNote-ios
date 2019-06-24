@@ -30,17 +30,17 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>4</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string></string>
+	<string>Take picture of item and scan QRCode</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string></string>
+	<string>Pick the picture for item to record</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string></string>
+	<string>Pick the picture for item to record</string>
 	<key>UILaunchStoryboardName</key>
 	<string>Main</string>
 	<key>UIMainStoryboardFile</key>

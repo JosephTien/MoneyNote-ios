@@ -11,8 +11,8 @@
 		7C012E0B21AE1537008E8AA5 /* ItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E0A21AE1537008E8AA5 /* ItemViewController.swift */; };
 		7C012E0E21AE1537008E8AA5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E0C21AE1537008E8AA5 /* Main.storyboard */; };
 		7C012E1321AE1538008E8AA5 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C012E1121AE1538008E8AA5 /* LaunchScreen.storyboard */; };
-		7C012E1E21AE1538008E8AA5 /* AccountSheetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */; };
-		7C012E2921AE1538008E8AA5 /* AccountSheetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */; };
+		7C012E1E21AE1538008E8AA5 /* MoneyNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E1D21AE1538008E8AA5 /* MoneyNoteTests.swift */; };
+		7C012E2921AE1538008E8AA5 /* MoneyNoteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C012E2821AE1538008E8AA5 /* MoneyNoteUITests.swift */; };
 		7C0D783821DC647E007DFB6A /* SideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0D783721DC647D007DFB6A /* SideViewController.swift */; };
 		7C0D783A21DC6B22007DFB6A /* SideConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0D783921DC6B22007DFB6A /* SideConfigViewController.swift */; };
 		7C172B7921C814B30077972A /* GSTableViewcontroller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C172B7821C814B30077972A /* GSTableViewcontroller.swift */; };
@@ -66,9 +66,9 @@
 		7C012E0D21AE1537008E8AA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7C012E1221AE1538008E8AA5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7C012E1421AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSheetTests.swift; sourceTree = "<group>"; };
+		7C012E1D21AE1538008E8AA5 /* MoneyNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyNoteTests.swift; sourceTree = "<group>"; };
 		7C012E1F21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSheetUITests.swift; sourceTree = "<group>"; };
+		7C012E2821AE1538008E8AA5 /* MoneyNoteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyNoteUITests.swift; sourceTree = "<group>"; };
 		7C012E2A21AE1538008E8AA5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7C0D783721DC647D007DFB6A /* SideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideViewController.swift; sourceTree = "<group>"; };
 		7C0D783921DC6B22007DFB6A /* SideConfigViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideConfigViewController.swift; sourceTree = "<group>"; };
@@ -179,7 +179,7 @@
 		7C012E1C21AE1538008E8AA5 /* MoneyNoteTests */ = {
 			isa = PBXGroup;
 			children = (
-				7C012E1D21AE1538008E8AA5 /* AccountSheetTests.swift */,
+				7C012E1D21AE1538008E8AA5 /* MoneyNoteTests.swift */,
 				7C012E1F21AE1538008E8AA5 /* Info.plist */,
 			);
 			path = MoneyNoteTests;
@@ -188,7 +188,7 @@
 		7C012E2721AE1538008E8AA5 /* MoneyNoteUITests */ = {
 			isa = PBXGroup;
 			children = (
-				7C012E2821AE1538008E8AA5 /* AccountSheetUITests.swift */,
+				7C012E2821AE1538008E8AA5 /* MoneyNoteUITests.swift */,
 				7C012E2A21AE1538008E8AA5 /* Info.plist */,
 			);
 			path = MoneyNoteUITests;
@@ -316,13 +316,16 @@
 				TargetAttributes = {
 					7C012E0421AE1537008E8AA5 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 					};
 					7C012E1821AE1538008E8AA5 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 						TestTargetID = 7C012E0421AE1537008E8AA5;
 					};
 					7C012E2321AE1538008E8AA5 = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 						TestTargetID = 7C012E0421AE1537008E8AA5;
 					};
 				};
@@ -533,7 +536,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C012E1E21AE1538008E8AA5 /* AccountSheetTests.swift in Sources */,
+				7C012E1E21AE1538008E8AA5 /* MoneyNoteTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -541,7 +544,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C012E2921AE1538008E8AA5 /* AccountSheetUITests.swift in Sources */,
+				7C012E2921AE1538008E8AA5 /* MoneyNoteUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -701,16 +704,18 @@
 			baseConfigurationReference = E182C455D4E90D0ECDB84D51 /* Pods-MoneyNote.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = U74P75S334;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
 				INFOPLIST_FILE = "$(SRCROOT)/MoneyNote/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.moneynote;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.notemoney;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -720,16 +725,18 @@
 			baseConfigurationReference = 3F2F118D8F73784A4A8D3477 /* Pods-MoneyNote.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = U74P75S334;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
 				INFOPLIST_FILE = "$(SRCROOT)/MoneyNote/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.moneynote;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.notemoney;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -741,7 +748,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = AccountSheetTests/Info.plist;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
+				INFOPLIST_FILE = MoneyNoteTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -749,7 +757,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.AccountSheetTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoneyNote.app/MoneyNote";
 			};
@@ -762,7 +770,8 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = AccountSheetTests/Info.plist;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
+				INFOPLIST_FILE = MoneyNoteTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -770,7 +779,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.AccountSheetTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MoneyNote.app/MoneyNote";
 			};
@@ -782,7 +791,8 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = AccountSheetUITests/Info.plist;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
+				INFOPLIST_FILE = MoneyNoteUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -790,7 +800,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.AccountSheetUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = AccountSheet;
 			};
@@ -802,7 +812,8 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = AccountSheetUITests/Info.plist;
+				DEVELOPMENT_TEAM = WAGW44Z6JC;
+				INFOPLIST_FILE = MoneyNoteUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -810,7 +821,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.jtien.AccountSheetUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = AccountSheet;
 			};
